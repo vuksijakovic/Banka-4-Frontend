@@ -32,14 +32,6 @@ import {
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -47,22 +39,16 @@ export default function NewEmployeePage() {
   const [date, setDate] = React.useState<Date>();
 
   const formSchema = z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    dateOfBirth: z.date({
-      required_error: 'Date of birth is required',
-    }),
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    dateOfBirth: z.date(),
     email: z.string().email('Invalid email address'),
-    address: z.string().min(1, 'Address is required'),
-    phoneNumber: z
-      .string()
-      .regex(/^\d+$/, 'Phone number must contain only numbers'),
-    position: z.string().min(1, 'Position is required'),
-    username: z.string().min(1, 'Username is required'),
-    department: z.string().min(1, 'Department is required'),
-    gender: z.enum(['male', 'female'], {
-      required_error: 'Gender is required',
-    }),
+    address: z.string().min(1),
+    phoneNumber: z.string().regex(/^(\+3816|06)(\d{7,8}|(77|78)\d{5,6})$/),
+    position: z.string().min(1),
+    username: z.string().min(1),
+    department: z.string().min(1),
+    gender: z.enum(['male', 'female']),
     isActive: z.boolean().default(true),
   });
 
@@ -85,27 +71,12 @@ export default function NewEmployeePage() {
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: FormValues) => {
     console.log(data);
   };
 
   return (
     <div>
-      <Breadcrumb
-        className="my-4 flex justify-left gap-2 ml-4"
-        style={{ width: '1184px', height: '28px' }}
-      >
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/employees">Employees</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>New</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
       <div className="flex justify-center items-center pt-16">
         <Card className="w-[800px]">
           <CardHeader>
@@ -128,7 +99,7 @@ export default function NewEmployeePage() {
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
                         First Name{' '}
-                        <span className="text-red-500 text-xl">•</span>
+                        <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="John" />
@@ -137,7 +108,6 @@ export default function NewEmployeePage() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="lastName"
@@ -145,7 +115,7 @@ export default function NewEmployeePage() {
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
                         Last Name{' '}
-                        <span className="text-red-500 text-xl">•</span>
+                        <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Doe" />
@@ -161,7 +131,7 @@ export default function NewEmployeePage() {
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
                         Date of Birth{' '}
-                        <span className="text-red-500 text-xl">•</span>
+                        <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Popover>
@@ -204,7 +174,7 @@ export default function NewEmployeePage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
-                        Email <span className="text-red-500 text-xl">•</span>
+                        Email <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="john@example.com" />
@@ -219,7 +189,7 @@ export default function NewEmployeePage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
-                        Address <span className="text-red-500 text-xl">•</span>
+                        Address <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Trg Republike 5" />
@@ -235,7 +205,7 @@ export default function NewEmployeePage() {
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
                         Phone Number{' '}
-                        <span className="text-red-500 text-xl">•</span>
+                        <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="+381" />
@@ -250,10 +220,10 @@ export default function NewEmployeePage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
-                        Position <span className="text-red-500 text-xl">•</span>
+                        Position <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Finance" />
+                        <Input {...field} placeholder="Manager" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -265,7 +235,7 @@ export default function NewEmployeePage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
-                        Username <span className="text-red-500 text-xl">•</span>
+                        Username <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="jdoe" />
@@ -281,7 +251,7 @@ export default function NewEmployeePage() {
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
                         Department{' '}
-                        <span className="text-red-500 text-xl">• </span>
+                        <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input {...field} placeholder="Finance" />
@@ -296,7 +266,7 @@ export default function NewEmployeePage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col space-y-1.5">
                       <FormLabel>
-                        Gender <span className="text-red-500 text-xl">•</span>
+                        Gender <span className="text-red-500 text-xl">*</span>
                       </FormLabel>
                       <FormControl>
                         <RadioGroup
@@ -332,7 +302,6 @@ export default function NewEmployeePage() {
               />
               <Label htmlFor="activeEmployee">Is this employee active?</Label>
             </div>
-
             <Button type="submit" onClick={form.handleSubmit(onSubmit)}>
               Save Changes
             </Button>
