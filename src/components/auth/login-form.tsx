@@ -5,9 +5,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import ForgotPasswordDialog from "@/components/auth/forgot-password-dialog";
 
 
 const formSchema = z.object({
@@ -45,11 +45,11 @@ export default function LoginForm() {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel className="text-gray-900">Email</FormLabel>
                                     <FormControl>
-                                        <Input type="email" placeholder="example@domain.com" {...field} />
+                                        <Input type="text" placeholder="example@domain.com" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage className="text-red-500" />
                                 </FormItem>
                             )}
                         />
@@ -58,14 +58,12 @@ export default function LoginForm() {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel className="text-gray-900">Password</FormLabel>
                                     <FormControl>
                                         <Input type="password" placeholder="**********" {...field} />
                                     </FormControl>
-                                    <FormMessage />
-                                    <p className="text-sm text-gray-500 text-right mt-1 cursor-pointer underline hover:underline">
-                                        Forgot your password?
-                                    </p>
+                                    <FormMessage className="text-red-500" />
+                                    <ForgotPasswordDialog />
                                 </FormItem>
                             )}
                         />
