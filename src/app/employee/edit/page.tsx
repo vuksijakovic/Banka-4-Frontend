@@ -1,7 +1,7 @@
 'use client';
 import EmployeeForm, {
   EmployeeFormValues,
-} from '@/components/form/employee/form';
+} from '@/components/employee/employee-form';
 
 export default function EditEmployeePage() {
   const employee: EmployeeFormValues = {

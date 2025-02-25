@@ -1,5 +1,5 @@
 'use client';
-import EmployeeForm from '@/components/form/employee/form';
+import EmployeeForm from '@/components/employee/employee-form';
 
 export default function NewEmployeePage() {
   return (
