@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email(),
 });
 
 export default function ForgotPasswordDialog() {
@@ -49,7 +49,14 @@ export default function ForgotPasswordDialog() {
             password.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit(onSubmit)();
+          }}
+          className="grid gap-4"
+        >
           <div className="grid gap-2">
             <Label htmlFor="email" className="text-sm font-medium">
               Email

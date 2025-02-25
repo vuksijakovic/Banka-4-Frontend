@@ -23,8 +23,8 @@ import {
 import ForgotPasswordDialog from '@/components/auth/forgot-password-dialog';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  email: z.string().email(),
+  password: z.string().nonempty(),
 });
 
 export default function LoginForm() {
@@ -41,7 +41,7 @@ export default function LoginForm() {
   };
 
   return (
-    <Card className="w-80 shadow-md">
+    <Card className="w-[348px] shadow-md">
       <CardHeader className="space-y-2">
         <CardTitle>Login</CardTitle>
         <CardDescription>
