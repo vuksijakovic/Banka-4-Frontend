@@ -2,14 +2,14 @@ const BASE_API_URL = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${BASE_API_URL}${endpoint}`;
-  let accessToken = sessionStorage.getItem("access_token");
+  const accessToken = sessionStorage.getItem('access_token');
 
   const config: RequestInit = {
     ...options,
     headers: {
       ...options.headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-      "Content-Type": "application/json",
+      Authorization: accessToken ? `Bearer ${accessToken}` : '',
+      'Content-Type': 'application/json',
     },
   };
 
@@ -19,7 +19,7 @@ export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
     const newAccessToken = await refreshAccessToken();
 
     if (newAccessToken) {
-      sessionStorage.setItem("access_token", newAccessToken);
+      sessionStorage.setItem('access_token', newAccessToken);
 
       config.headers = {
         ...config.headers,
@@ -38,29 +38,29 @@ export const fetcher = async (endpoint: string, options: RequestInit = {}) => {
 };
 
 const refreshAccessToken = async () => {
-  const refreshToken = sessionStorage.getItem("refresh_token");
+  const refreshToken = sessionStorage.getItem('refresh_token');
 
   if (!refreshToken) {
-    console.log("No refresh token available");
+    console.log('No refresh token available');
     return null;
   }
 
   try {
     const res = await fetch(`${BASE_API_URL}/auth/refresh-token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: refreshToken }),
     });
 
     if (!res.ok) {
-      console.log("Failed to refresh token");
+      console.log('Failed to refresh token');
       return null;
     }
 
     const data = await res.json();
     return data.access_token;
   } catch (error) {
-    console.error("Error refreshing access token:", error);
+    console.error('Error refreshing access token:', error);
     return null;
   }
 };
