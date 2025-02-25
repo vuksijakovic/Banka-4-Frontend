@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetcher } from "@/lib/fetcher";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetcher } from '@/lib/fetcher';
 
 interface User {
   id: string;
@@ -22,8 +22,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const queryClient = useQueryClient();
   const [accessToken, setAccessToken] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem("access_token");
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('access_token');
     }
     return null;
   });
@@ -31,10 +31,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const { data, isLoading, refetch } = useQuery<User | null>({
-    queryKey: ["auth", "user"],
-    queryFn: () => fetcher("/auth/me"),
+    queryKey: ['auth', 'user'],
+    queryFn: () => fetcher('/auth/me'),
     enabled: !!accessToken,
-    retry: false
+    retry: false,
   });
 
   useEffect(() => {
@@ -42,9 +42,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [data]);
 
   const login = (accessToken: string, refreshToken: string) => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("access_token", accessToken);
-      sessionStorage.setItem("refresh_token", refreshToken);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('access_token', accessToken);
+      sessionStorage.setItem('refresh_token', refreshToken);
     }
     setAccessToken(accessToken);
 
@@ -53,20 +53,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const refreshToken = typeof window !== "undefined" ? sessionStorage.getItem("refresh_token") : null;
-      return fetcher("/auth/logout", {
-        method: "POST",
+      const refreshToken =
+        typeof window !== 'undefined'
+          ? sessionStorage.getItem('refresh_token')
+          : null;
+      return fetcher('/auth/logout', {
+        method: 'POST',
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
     },
     onSuccess: () => {
-      if (typeof window !== "undefined") {
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('access_token');
+        sessionStorage.removeItem('refresh_token');
       }
       setAccessToken(null);
-      setUser(null); 
-      queryClient.setQueryData(["auth", "user"], null);
+      setUser(null);
+      queryClient.setQueryData(['auth', 'user'], null);
     },
   });
 
@@ -81,6 +84,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
