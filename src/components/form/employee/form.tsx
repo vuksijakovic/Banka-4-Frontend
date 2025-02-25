@@ -34,6 +34,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { SomePartial } from '@/types/utils';
 
 const formSchema = z.object({
   firstName: z.string().min(1),
@@ -55,7 +56,7 @@ export interface EmployeeFormProps {
   title: string;
   description: string;
   onSubmit: (values: EmployeeFormValues) => void;
-  defaultValues: EmployeeFormValues;
+  defaultValues: SomePartial<EmployeeFormValues, 'dateOfBirth'>;
 }
 
 export default function EmployeeForm({
@@ -64,10 +65,6 @@ export default function EmployeeForm({
   onSubmit,
   defaultValues,
 }: EmployeeFormProps) {
-  const [date, setDate] = React.useState<Date | undefined>(
-    defaultValues?.dateOfBirth
-  );
-
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -134,12 +131,12 @@ export default function EmployeeForm({
                               variant={'outline'}
                               className={cn(
                                 'w-full justify-start text-left font-normal',
-                                !date && 'text-muted-foreground'
+                                !field.value && 'text-muted-foreground'
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {date ? (
-                                format(date, 'PPP')
+                              {field.value ? (
+                                format(field.value, 'PPP')
                               ) : (
                                 <span>Pick a date</span>
                               )}
@@ -148,11 +145,8 @@ export default function EmployeeForm({
                           <PopoverContent className="w-auto p-0">
                             <Calendar
                               mode="single"
-                              selected={date}
-                              onSelect={(selectedDate) => {
-                                setDate(selectedDate);
-                                field.onChange(selectedDate);
-                              }}
+                              selected={field.value}
+                              onSelect={field.onChange}
                               initialFocus
                             />
                           </PopoverContent>

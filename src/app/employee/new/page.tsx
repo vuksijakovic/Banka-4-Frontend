@@ -10,7 +10,7 @@ export default function NewEmployeePage() {
       defaultValues={{
         firstName: '',
         lastName: '',
-        dateOfBirth: new Date(),
+        dateOfBirth: undefined,
         email: '',
         address: '',
         phoneNumber: '',
