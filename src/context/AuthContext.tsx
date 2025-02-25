@@ -21,39 +21,51 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const queryClient = useQueryClient();
-  const [accessToken, setAccessToken] = useState<string | null>(
-    () => sessionStorage.getItem("access_token")
-  );
+  const [accessToken, setAccessToken] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("access_token");
+    }
+    return null;
+  });
 
-  const { data, isLoading, isError, refetch } = useQuery<User | null>({
+  const [user, setUser] = useState<User | null>(null);
+
+  const { data, isLoading, refetch } = useQuery<User | null>({
     queryKey: ["auth", "user"],
     queryFn: () => fetcher("/auth/me"),
-    enabled: !!accessToken, 
-    retry: false,
+    enabled: !!accessToken,
+    retry: false
   });
-  
-  const user = data || null;
+
+  useEffect(() => {
+    setUser(data || null);
+  }, [data]);
 
   const login = (accessToken: string, refreshToken: string) => {
-    sessionStorage.setItem("access_token", accessToken);
-    sessionStorage.setItem("refresh_token", refreshToken);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("access_token", accessToken);
+      sessionStorage.setItem("refresh_token", refreshToken);
+    }
     setAccessToken(accessToken);
 
-    refetch();  
+    refetch();
   };
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const refreshToken = sessionStorage.getItem("refresh_token");
+      const refreshToken = typeof window !== "undefined" ? sessionStorage.getItem("refresh_token") : null;
       return fetcher("/auth/logout", {
         method: "POST",
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
     },
     onSuccess: () => {
-      sessionStorage.removeItem("access_token");
-      sessionStorage.removeItem("refresh_token");
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("access_token");
+        sessionStorage.removeItem("refresh_token");
+      }
       setAccessToken(null);
+      setUser(null); 
       queryClient.setQueryData(["auth", "user"], null);
     },
   });
