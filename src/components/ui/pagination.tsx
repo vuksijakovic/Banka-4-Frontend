@@ -142,7 +142,7 @@ const PaginationSection = ({
   };
 
   return (
-    <div className="flex mt-4 justify-between items-center">
+    <div className="flex mt-5 justify-between items-center">
       {pageCount >= 2 && (
         <Pagination>
           <PaginationContent>
