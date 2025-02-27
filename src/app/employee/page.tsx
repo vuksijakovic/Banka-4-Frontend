@@ -23,6 +23,8 @@ import { mockEmployees } from './mockDataOverview';
 
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 
+import { useRouter } from 'next/navigation';
+
 const employeeSchema = z.object({
   id: z.number(),
   first_name: z.string(),
@@ -45,6 +47,7 @@ const EmployeeOverviewPage: React.FC = () => {
     email: '',
     position: '',
   });
+  const router = useRouter();
   const rowsPerPage = 8;
 
   useEffect(() => {
@@ -181,7 +184,7 @@ const EmployeeOverviewPage: React.FC = () => {
                     </TableRow>
                   ) : (
                     currentEmployees.map((employee) => (
-                      <TableRow key={employee.id}>
+                      <TableRow key={employee.id} onClick={() =>router.replace(`/employee/${employee.id}/edit`)}>
                         <TableCell>{employee.first_name}</TableCell>
                         <TableCell>{employee.last_name}</TableCell>
                         <TableCell>{employee.email}</TableCell>
