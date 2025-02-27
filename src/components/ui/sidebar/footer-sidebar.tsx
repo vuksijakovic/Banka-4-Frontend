@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/context/AuthContext';
 
 export function FooterSidebar({
   user,
@@ -28,6 +29,7 @@ export function FooterSidebar({
   };
 }) {
   const { isMobile } = useSidebar();
+  const auth = useAuth();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -67,7 +69,14 @@ export function FooterSidebar({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              className={'cursor-pointer'}
+              onClick={() => {
+                if (auth.isLoggedIn) {
+                  auth.logout();
+                }
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>
