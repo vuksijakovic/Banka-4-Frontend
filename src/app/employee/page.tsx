@@ -12,63 +12,63 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Loader2, Search } from 'lucide-react';
-
 import { PaginationSection } from '@/components/ui/pagination';
-
 import { Input } from '@/components/ui/input';
-
 import { Button } from '@/components/ui/button';
-
 import { mockEmployees } from './mockDataOverview';
-
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
-
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 const employeeSchema = z.object({
   id: z.number(),
-  first_name: z.string(),
-  last_name: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
   email: z.string(),
-  phone_number: z.string(),
+  phone: z.string(),
   position: z.string(),
   active: z.boolean(),
 });
 
 type Employee = z.infer<typeof employeeSchema>;
 
+const getAccessToken = () => {
+  return sessionStorage.getItem('b4/accessToken'); // Replace with your method of getting the access token
+};
+
+const buildUrl = (filters: { first_name: string; last_name: string; email: string; position: string; }, rowsPerPage: number) => {
+  let url = `http://localhost:8080/employee/search?size=${rowsPerPage}`;
+  if (filters.first_name) url += `&firstName=${filters.first_name}`;
+  if (filters.last_name) url += `&lastName=${filters.last_name}`;
+  if (filters.email) url += `&email=${filters.email}`;
+  if (filters.position) url += `&position=${filters.position}`;
+  return url;
+};
+
 const EmployeeOverviewPage: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [filters, setFilters] = useState({
     first_name: '',
     last_name: '',
     email: '',
     position: '',
   });
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const router = useRouter();
   const rowsPerPage = 8;
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      setLoading(true);
-      try {
-        // temelj za API poziv, do veceras umesto njega samo koristiti mockData.ts 10:13 24.02.2025
-
-        // const res = await fetch('/employee');
-        // const data = await res.json();
-        // const parsedData = z.array(employeeSchema).parse(data);
-        // setEmployees(parsedData);
-
-        const parsedData = z.array(employeeSchema).parse(mockEmployees);
-        setEmployees(parsedData);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEmployees();
-  }, [currentPage, filters]);
+  const { data, isLoading } = useQuery({
+    queryKey: ['employees'],
+    queryFn: async () => {
+      const url = buildUrl(filters, rowsPerPage);
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      return response.data;
+    }
+  });
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -80,23 +80,11 @@ const EmployeeOverviewPage: React.FC = () => {
 
   const handleSearch = () => {
     setCurrentPage(1);
-    // Call your backend API with the filters here
   };
 
-  // Calculate paginated data
-  const indexOfLastEmployee = currentPage * rowsPerPage;
-  const indexOfFirstEmployee = indexOfLastEmployee - rowsPerPage;
-  const currentEmployees = employees.slice(
-    indexOfFirstEmployee,
-    indexOfLastEmployee
-  );
+  const employees = data?.content;
+  const totalPages = data?.totalPages || 0;
 
-  // Calculate total pages
-  const totalPages = Math.ceil(employees.length / rowsPerPage);
-
-  // u items-u se nalazi sta ce biti prikazano kao breadcrumb,
-  // title je sta se prikazuje a url je gde vodi,
-  //moraju da budu poredjani u redosledu kako ce se prikazivati
   const { dispatch } = useBreadcrumb();
   useEffect(() => {
     dispatch({
@@ -154,7 +142,7 @@ const EmployeeOverviewPage: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent className="rounded-lg overflow-hidden">
-          {loading ? (
+          {isLoading ? (
             <div className="flex justify-center p-4">
               <Loader2 className="animate-spin w-6 h-6" />
             </div>
@@ -173,7 +161,7 @@ const EmployeeOverviewPage: React.FC = () => {
                 </TableHeader>
 
                 <TableBody>
-                  {currentEmployees.length === 0 ? (
+                  {employees === undefined || employees.length === 0   ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
@@ -183,12 +171,12 @@ const EmployeeOverviewPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    currentEmployees.map((employee) => (
+                    employees.map((employee : Employee) => (
                       <TableRow key={employee.id} onClick={() =>router.replace(`/employee/${employee.id}/edit`)}>
-                        <TableCell>{employee.first_name}</TableCell>
-                        <TableCell>{employee.last_name}</TableCell>
+                        <TableCell>{employee.firstName}</TableCell>
+                        <TableCell>{employee.lastName}</TableCell>
                         <TableCell>{employee.email}</TableCell>
-                        <TableCell>{employee.phone_number}</TableCell>
+                        <TableCell>{employee.phone}</TableCell>
                         <TableCell>{employee.position}</TableCell>
                         <TableCell>{employee.active ? 'Yes' : 'No'}</TableCell>
                       </TableRow>
@@ -200,8 +188,8 @@ const EmployeeOverviewPage: React.FC = () => {
                 pageCount={totalPages}
                 currentPage={currentPage}
                 onChangePage={setCurrentPage}
-                resultsLength={employees.length}
-                pageSize={rowsPerPage}
+                resultsLength={data === undefined ? 0 : data.totalPages}
+                pageSize={data === undefined ? 0 : data.size}
               ></PaginationSection>
             </>
           )}
