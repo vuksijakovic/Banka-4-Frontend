@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { z } from 'zod';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Table,
@@ -22,18 +21,6 @@ import { EmployeeResponseDto } from '@/api/response/auth';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { searchEmployees } from '@/api/employee';
-
-const employeeSchema = z.object({
-  id: z.number(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  position: z.string(),
-  active: z.boolean(),
-});
-
-type Employee = z.infer<typeof employeeSchema>;
 
 const EmployeeOverviewPage: React.FC = () => {
   const [filters, setFilters] = useState({
