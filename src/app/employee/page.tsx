@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
-
+import { EmployeeResponseDto } from '@/api/response/auth';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { searchEmployees } from '@/api/employee';
@@ -45,7 +45,7 @@ const EmployeeOverviewPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchFilters, setSearchFilters] = useState(filters);
   const router = useRouter();
-  const rowsPerPage = 1;
+  const rowsPerPage = 8;
 
   const client = useHttpClient();
 
@@ -165,7 +165,7 @@ const EmployeeOverviewPage: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      employees.map((employee: Employee) => (
+                      employees.map((employee: EmployeeResponseDto) => (
                         <TableRow
                           key={employee.id}
                           onClick={() =>
