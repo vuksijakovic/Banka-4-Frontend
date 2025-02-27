@@ -1,6 +1,7 @@
 import { Axios } from 'axios';
 import { MeResponseDto } from './response/MeResponseDto';
 import { NewEmployeeRequest } from '@/api/request/employee';
+import { EmployeeOverviewResponseDto } from '@/api/response/employee';
 
 export const getMe = async (client: Axios) =>
   client.get<MeResponseDto>('/employee/me');
@@ -26,5 +27,5 @@ export const searchEmployees = async (
   if (filters.lastName) url += `&lastName=${filters.lastName}`;
   if (filters.email) url += `&email=${filters.email}`;
   if (filters.position) url += `&position=${filters.position}`;
-  return client.get(url);
+  return client.get<EmployeeOverviewResponseDto>(url);
 };

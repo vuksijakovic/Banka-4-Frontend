@@ -17,27 +17,27 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
-import { EmployeeResponseDto } from '@/api/response/auth';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { searchEmployees } from '@/api/employee';
+import { EmployeeResponseDto } from '@/api/response/employee';
 
 const EmployeeOverviewPage: React.FC = () => {
-  const [filters, setFilters] = useState({
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchFilters, setSearchFilters] = useState({
     firstName: '',
     lastName: '',
     email: '',
     position: '',
   });
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [searchFilters, setSearchFilters] = useState(filters);
   const router = useRouter();
   const rowsPerPage = 8;
 
+  const queryClient = useQueryClient();
   const client = useHttpClient();
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ['employees', searchFilters, currentPage - 1, rowsPerPage],
+  const { data, isLoading } = useQuery({
+    queryKey: ['employees', currentPage, rowsPerPage],
     queryFn: async () => {
       const response = await searchEmployees(
         client,
@@ -51,19 +51,18 @@ const EmployeeOverviewPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters((prevFilters) => ({
+    setSearchFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
     }));
   };
 
   const handleSearch = () => {
-    setSearchFilters(filters);
+    queryClient.invalidateQueries({
+      queryKey: ['employees', currentPage, rowsPerPage],
+    });
     setCurrentPage(1);
-    refetch();
   };
-
-  const employees = data?.content || [];
 
   const { dispatch } = useBreadcrumb();
   useEffect(() => {
@@ -87,40 +86,46 @@ const EmployeeOverviewPage: React.FC = () => {
               This table provides a clear and organized overview of key employee
               details for quick reference and easy access.
             </p>
-            <div className="flex mb-4 space-x-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+              className="flex mb-4 space-x-2"
+            >
               <Input
                 type="text"
                 name="firstName"
                 placeholder="filter by first name"
-                value={filters.firstName}
+                value={searchFilters.firstName}
                 onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="lastName"
                 placeholder="filter by last name"
-                value={filters.lastName}
+                value={searchFilters.lastName}
                 onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="email"
                 placeholder="filter by email"
-                value={filters.email}
+                value={searchFilters.email}
                 onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="position"
                 placeholder="filter by position"
-                value={filters.position}
+                value={searchFilters.position}
                 onChange={handleInputChange}
               />
-              <Button onClick={handleSearch}>
+              <Button type={'submit'} onClick={handleSearch}>
                 Search
                 <Search className="w-4 h-4 mr-1" />
               </Button>
-            </div>
+            </form>
           </CardHeader>
           <CardContent className="rounded-lg overflow-hidden">
             {isLoading ? (
@@ -142,18 +147,19 @@ const EmployeeOverviewPage: React.FC = () => {
                   </TableHeader>
 
                   <TableBody>
-                    {employees === undefined || employees.length === 0 ? (
+                    {data === undefined || data.empty ? (
                       <TableRow>
                         <TableCell
                           colSpan={6}
-                          className="text-center p-6 text-zinc-500"
+                          className="text-center p-6 text-muted-foreground"
                         >
                           There are currently no employees
                         </TableCell>
                       </TableRow>
                     ) : (
-                      employees.map((employee: EmployeeResponseDto) => (
+                      data.content.map((employee: EmployeeResponseDto) => (
                         <TableRow
+                          className={'cursor-pointer'}
                           key={employee.id}
                           onClick={() =>
                             router.push(`/employee/${employee.id}/edit`)
@@ -172,16 +178,17 @@ const EmployeeOverviewPage: React.FC = () => {
                     )}
                   </TableBody>
                 </Table>
-                <PaginationSection
-                  pageCount={data?.totalPages}
-                  currentPage={currentPage}
-                  onChangePage={(page) => {
-                    setCurrentPage(page);
-                    refetch();
-                  }}
-                  resultsLength={employees.length}
-                  pageSize={rowsPerPage}
-                ></PaginationSection>
+                {data !== undefined && (
+                  <PaginationSection
+                    pageCount={data.totalPages}
+                    currentPage={currentPage}
+                    onChangePage={(page) => {
+                      setCurrentPage(page);
+                    }}
+                    resultsLength={data.numberOfElements}
+                    pageSize={rowsPerPage}
+                  ></PaginationSection>
+                )}
               </>
             )}
           </CardContent>
