@@ -152,7 +152,7 @@ const PaginationSection = ({
                 onClick={() => handlePreviousPage()}
               />
             </PaginationItem>
-            {pageCount > 5 && (
+            {pageCount > 6 && (
               <PaginationItem key={1}>
                 {pageCount < 7 || currentPage < 4 ? (
                   <PaginationLink
@@ -168,9 +168,9 @@ const PaginationSection = ({
               </PaginationItem>
             )}
 
-            {Array.from({ length: pageCount > 5 ? 5 : pageCount }, (_, i) => {
+            {Array.from({ length: pageCount > 7 ? 5 : pageCount }, (_, i) => {
               let page: number;
-              if (pageCount <= 5) {
+              if (pageCount < 7) {
                 page = i + 1;
               } else if (currentPage <= 3) {
                 page = i + 2;
@@ -191,7 +191,7 @@ const PaginationSection = ({
                 </PaginationItem>
               );
             })}
-            {pageCount > 5 && (
+            {pageCount > 6 && (
               <PaginationItem key={7}>
                 {pageCount < 7 || currentPage + 3 >= pageCount ? (
                   <PaginationLink

@@ -45,12 +45,12 @@ const EmployeeOverviewPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchFilters, setSearchFilters] = useState(filters);
   const router = useRouter();
-  const rowsPerPage = 8;
+  const rowsPerPage = 1;
 
   const client = useHttpClient();
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['employees', searchFilters, currentPage, rowsPerPage],
+    queryKey: ['employees', searchFilters, currentPage - 1, rowsPerPage],
     queryFn: async () => {
       const response = await searchEmployees(
         client,
@@ -77,7 +77,6 @@ const EmployeeOverviewPage: React.FC = () => {
   };
 
   const employees = data?.content || [];
-  const totalPages = data?.totalPages || 0;
 
   const { dispatch } = useBreadcrumb();
   useEffect(() => {
@@ -187,7 +186,7 @@ const EmployeeOverviewPage: React.FC = () => {
                   </TableBody>
                 </Table>
                 <PaginationSection
-                  pageCount={totalPages}
+                  pageCount={data?.totalPages}
                   currentPage={currentPage}
                   onChangePage={(page) => {
                     setCurrentPage(page);
