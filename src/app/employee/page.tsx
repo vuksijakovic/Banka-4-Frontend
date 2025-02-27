@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { z } from 'zod';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Table,
@@ -11,90 +10,60 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useHttpClient } from '@/context/HttpClientContext';
 import { Loader2, Search } from 'lucide-react';
-
 import { PaginationSection } from '@/components/ui/pagination';
-
 import { Input } from '@/components/ui/input';
-
 import { Button } from '@/components/ui/button';
-
-import { mockEmployees } from './mockDataOverview';
-
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
-
-const employeeSchema = z.object({
-  id: z.number(),
-  first_name: z.string(),
-  last_name: z.string(),
-  email: z.string(),
-  phone_number: z.string(),
-  position: z.string(),
-  active: z.boolean(),
-});
-
-type Employee = z.infer<typeof employeeSchema>;
+import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { searchEmployees } from '@/api/employee';
+import { EmployeeResponseDto } from '@/api/response/employee';
 
 const EmployeeOverviewPage: React.FC = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [filters, setFilters] = useState({
-    first_name: '',
-    last_name: '',
+  const [searchFilters, setSearchFilters] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
     position: '',
   });
+  const router = useRouter();
   const rowsPerPage = 8;
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      setLoading(true);
-      try {
-        // temelj za API poziv, do veceras umesto njega samo koristiti mockData.ts 10:13 24.02.2025
+  const queryClient = useQueryClient();
+  const client = useHttpClient();
 
-        // const res = await fetch('/employee');
-        // const data = await res.json();
-        // const parsedData = z.array(employeeSchema).parse(data);
-        // setEmployees(parsedData);
+  const { data, isLoading } = useQuery({
+    queryKey: ['employees', currentPage, rowsPerPage],
+    queryFn: async () => {
+      const response = await searchEmployees(
+        client,
+        searchFilters,
+        rowsPerPage,
+        currentPage
+      );
+      return response.data;
+    },
+  });
 
-        const parsedData = z.array(employeeSchema).parse(mockEmployees);
-        setEmployees(parsedData);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEmployees();
-  }, [currentPage, filters]);
-
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFilters((prevFilters) => ({
+    setSearchFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
     }));
   };
 
   const handleSearch = () => {
+    queryClient.invalidateQueries({
+      queryKey: ['employees', currentPage, rowsPerPage],
+    });
     setCurrentPage(1);
-    // Call your backend API with the filters here
   };
 
-  // Calculate paginated data
-  const indexOfLastEmployee = currentPage * rowsPerPage;
-  const indexOfFirstEmployee = indexOfLastEmployee - rowsPerPage;
-  const currentEmployees = employees.slice(
-    indexOfFirstEmployee,
-    indexOfLastEmployee
-  );
-
-  // Calculate total pages
-  const totalPages = Math.ceil(employees.length / rowsPerPage);
-
-  // u items-u se nalazi sta ce biti prikazano kao breadcrumb,
-  // title je sta se prikazuje a url je gde vodi,
-  //moraju da budu poredjani u redosledu kako ce se prikazivati
   const { dispatch } = useBreadcrumb();
   useEffect(() => {
     dispatch({
@@ -117,43 +86,49 @@ const EmployeeOverviewPage: React.FC = () => {
               This table provides a clear and organized overview of key employee
               details for quick reference and easy access.
             </p>
-            <div className="flex mb-4 space-x-2">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+              className="flex mb-4 space-x-2"
+            >
               <Input
                 type="text"
-                name="first_name"
+                name="firstName"
                 placeholder="filter by first name"
-                value={filters.first_name}
-                onChange={handleFilterChange}
+                value={searchFilters.firstName}
+                onChange={handleInputChange}
               />
               <Input
                 type="text"
-                name="last_name"
+                name="lastName"
                 placeholder="filter by last name"
-                value={filters.last_name}
-                onChange={handleFilterChange}
+                value={searchFilters.lastName}
+                onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="email"
                 placeholder="filter by email"
-                value={filters.email}
-                onChange={handleFilterChange}
+                value={searchFilters.email}
+                onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="position"
                 placeholder="filter by position"
-                value={filters.position}
-                onChange={handleFilterChange}
+                value={searchFilters.position}
+                onChange={handleInputChange}
               />
-              <Button onClick={handleSearch}>
+              <Button type={'submit'} onClick={handleSearch}>
                 Search
                 <Search className="w-4 h-4 mr-1" />
               </Button>
-            </div>
+            </form>
           </CardHeader>
           <CardContent className="rounded-lg overflow-hidden">
-            {loading ? (
+            {isLoading ? (
               <div className="flex justify-center p-4">
                 <Loader2 className="animate-spin w-6 h-6" />
               </div>
@@ -172,22 +147,28 @@ const EmployeeOverviewPage: React.FC = () => {
                   </TableHeader>
 
                   <TableBody>
-                    {currentEmployees.length === 0 ? (
+                    {data === undefined || data.empty ? (
                       <TableRow>
                         <TableCell
                           colSpan={6}
-                          className="text-center p-6 text-zinc-500"
+                          className="text-center p-6 text-muted-foreground"
                         >
                           There are currently no employees
                         </TableCell>
                       </TableRow>
                     ) : (
-                      currentEmployees.map((employee) => (
-                        <TableRow key={employee.id}>
-                          <TableCell>{employee.first_name}</TableCell>
-                          <TableCell>{employee.last_name}</TableCell>
+                      data.content.map((employee: EmployeeResponseDto) => (
+                        <TableRow
+                          className={'cursor-pointer'}
+                          key={employee.id}
+                          onClick={() =>
+                            router.push(`/employee/${employee.id}/edit`)
+                          }
+                        >
+                          <TableCell>{employee.firstName}</TableCell>
+                          <TableCell>{employee.lastName}</TableCell>
                           <TableCell>{employee.email}</TableCell>
-                          <TableCell>{employee.phone_number}</TableCell>
+                          <TableCell>{employee.phone}</TableCell>
                           <TableCell>{employee.position}</TableCell>
                           <TableCell>
                             {employee.active ? 'Yes' : 'No'}
@@ -197,13 +178,17 @@ const EmployeeOverviewPage: React.FC = () => {
                     )}
                   </TableBody>
                 </Table>
-                <PaginationSection
-                  pageCount={totalPages}
-                  currentPage={currentPage}
-                  onChangePage={setCurrentPage}
-                  resultsLength={employees.length}
-                  pageSize={rowsPerPage}
-                ></PaginationSection>
+                {data !== undefined && (
+                  <PaginationSection
+                    pageCount={data.totalPages}
+                    currentPage={currentPage}
+                    onChangePage={(page) => {
+                      setCurrentPage(page);
+                    }}
+                    resultsLength={data.numberOfElements}
+                    pageSize={rowsPerPage}
+                  ></PaginationSection>
+                )}
               </>
             )}
           </CardContent>
