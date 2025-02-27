@@ -15,7 +15,6 @@ import { Loader2, Search } from 'lucide-react';
 import { PaginationSection } from '@/components/ui/pagination';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { mockEmployees } from './mockDataOverview';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -37,7 +36,15 @@ const getAccessToken = () => {
   return sessionStorage.getItem('b4/accessToken'); // Replace with your method of getting the access token
 };
 
-const buildUrl = (filters: { first_name: string; last_name: string; email: string; position: string; }, rowsPerPage: number) => {
+const buildUrl = (
+  filters: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    position: string;
+  },
+  rowsPerPage: number
+) => {
   let url = `http://localhost:8080/employee/search?size=${rowsPerPage}`;
   if (filters.first_name) url += `&firstName=${filters.first_name}`;
   if (filters.last_name) url += `&lastName=${filters.last_name}`;
@@ -67,7 +74,7 @@ const EmployeeOverviewPage: React.FC = () => {
         },
       });
       return response.data;
-    }
+    },
   });
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,7 +168,7 @@ const EmployeeOverviewPage: React.FC = () => {
                 </TableHeader>
 
                 <TableBody>
-                  {employees === undefined || employees.length === 0   ? (
+                  {employees === undefined || employees.length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
@@ -171,8 +178,13 @@ const EmployeeOverviewPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    employees.map((employee : Employee) => (
-                      <TableRow key={employee.id} onClick={() =>router.replace(`/employee/${employee.id}/edit`)}>
+                    employees.map((employee: Employee) => (
+                      <TableRow
+                        key={employee.id}
+                        onClick={() =>
+                          router.replace(`/employee/${employee.id}/edit`)
+                        }
+                      >
                         <TableCell>{employee.firstName}</TableCell>
                         <TableCell>{employee.lastName}</TableCell>
                         <TableCell>{employee.email}</TableCell>
