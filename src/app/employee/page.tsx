@@ -21,7 +21,6 @@ import GuardBlock from '@/components/GuardBlock';
 
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { searchEmployees } from '@/api/employee';
 
 const employeeSchema = z.object({
@@ -44,20 +43,21 @@ const EmployeeOverviewPage: React.FC = () => {
     position: '',
   });
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchFilters, setSearchFilters] = useState(filters);
   const router = useRouter();
   const rowsPerPage = 8;
 
   const client = useHttpClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['employees', currentPage, filters],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['employees', searchFilters, currentPage, rowsPerPage],
     queryFn: async () => {
-        const response = await searchEmployees(client, filters, rowsPerPage, currentPage);
-        return response.data;
-      },
-  });
+      const response = await searchEmployees(client, searchFilters, rowsPerPage, currentPage);
+      return response.data;
+    },
+      });
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -66,7 +66,9 @@ const EmployeeOverviewPage: React.FC = () => {
   };
 
   const handleSearch = () => {
+    setSearchFilters(filters);
     setCurrentPage(1);
+    refetch();
   };
 
   const employees = data?.content || [];
@@ -97,31 +99,31 @@ const EmployeeOverviewPage: React.FC = () => {
             <div className="flex mb-4 space-x-2">
               <Input
                 type="text"
-                name="first_name"
+                name="firstName"
                 placeholder="filter by first name"
                 value={filters.firstName}
-                onChange={handleFilterChange}
+                onChange={handleInputChange}
               />
               <Input
                 type="text"
-                name="last_name"
+                name="lastName"
                 placeholder="filter by last name"
                 value={filters.lastName}
-                onChange={handleFilterChange}
+                onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="email"
                 placeholder="filter by email"
                 value={filters.email}
-                onChange={handleFilterChange}
+                onChange={handleInputChange}
               />
               <Input
                 type="text"
                 name="position"
                 placeholder="filter by position"
                 value={filters.position}
-                onChange={handleFilterChange}
+                onChange={handleInputChange}
               />
               <Button onClick={handleSearch}>
                 Search
@@ -138,7 +140,7 @@ const EmployeeOverviewPage: React.FC = () => {
               <>
                 <Table>
                   <TableHeader>
-                    <TableRow >
+                    <TableRow>
                       <TableHead>First Name</TableHead>
                       <TableHead>Last Name</TableHead>
                       <TableHead>Email</TableHead>
@@ -159,7 +161,7 @@ const EmployeeOverviewPage: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      employees.map((employee : Employee) => (
+                      employees.map((employee: Employee) => (
                         <TableRow key={employee.id} onClick={() => router.push(`/employee/${employee.id}/edit`)}>
                           <TableCell>{employee.firstName}</TableCell>
                           <TableCell>{employee.lastName}</TableCell>
@@ -177,8 +179,11 @@ const EmployeeOverviewPage: React.FC = () => {
                 <PaginationSection
                   pageCount={totalPages}
                   currentPage={currentPage}
-                  onChangePage={setCurrentPage}
-                  resultsLength={0}
+                  onChangePage={(page) => {
+                    setCurrentPage(page);
+                    refetch();
+                  }}
+                  resultsLength={employees.length}
                   pageSize={rowsPerPage}
                 ></PaginationSection>
               </>
