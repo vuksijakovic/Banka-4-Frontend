@@ -8,13 +8,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
+import { useHttpClient } from '@/context/HttpClientContext';
+import { useMutation } from '@tanstack/react-query';
+import { forgotPassword } from '@/api/employee';
+import { toastRequestError } from '@/api/errors';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),
@@ -23,13 +27,19 @@ const forgotPasswordSchema = z.object({
 export default function ForgotPasswordDialog() {
   const form = useForm({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: '',
-    },
+    defaultValues: { email: '' },
   });
 
-  const onSubmit = (values: { email: string }) => {
-    console.log('Sending reset link to:', values.email);
+  const httpClient = useHttpClient();
+  const { isPending, mutate: doForgotPassword } = useMutation({
+    mutationFn: async (email: string) =>
+      await forgotPassword(httpClient, email),
+    onError: (error) => toastRequestError(error),
+  });
+
+  const onSubmit = async (data: { email: string }) => {
+    console.log('here');
+    doForgotPassword(data.email);
   };
 
   return (
@@ -53,7 +63,7 @@ export default function ForgotPasswordDialog() {
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            form.handleSubmit(onSubmit)();
+            form.handleSubmit(onSubmit);
           }}
           className="grid gap-4"
         >
@@ -73,9 +83,14 @@ export default function ForgotPasswordDialog() {
               </p>
             )}
           </div>
+
           <DialogFooter>
-            <Button type="submit" className="flex justify-end font-normal">
-              Send Email
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="flex justify-end font-normal"
+            >
+              {isPending ? 'Sending...' : 'Send Email'}
             </Button>
           </DialogFooter>
         </form>
