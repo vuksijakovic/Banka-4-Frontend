@@ -20,8 +20,8 @@ import {
 } from '@/components/ui/form';
 import { verifyPassword } from '@/api/employee';
 import { VerifyPasswordRequest } from '@/api/request/auth';
-import axios from 'axios';
 import { toastRequestError } from '@/api/errors';
+import { useHttpClient } from '@/context/HttpClientContext';
 
 // Zod schema for password validation
 const passwordSchema = z
@@ -41,6 +41,7 @@ type PasswordParams = {
 
 export default function PasswordPage() {
   const params = useParams<PasswordParams>();
+  const client = useHttpClient();
   const router = useRouter();
 
   if (params.type !== 'set' && params.type !== 'reset') notFound();
@@ -57,7 +58,7 @@ export default function PasswordPage() {
 
   const { isPending, mutate: doVerify } = useMutation({
     mutationFn: async (data: VerifyPasswordRequest) =>
-      verifyPassword(axios, data),
+      verifyPassword(client, data),
     onSuccess: () => {
       toast.success(
         isReset ? 'Password reset successfully!' : 'Password set successfully!'
