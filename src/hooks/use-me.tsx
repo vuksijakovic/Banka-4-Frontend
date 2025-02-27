@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { forgotPassword, getMe } from '@/api/employee';
+import { getMe } from '@/api/employee';
 import { Axios } from 'axios';
 
 export function useMe(client: Axios) {
@@ -8,5 +8,3 @@ export function useMe(client: Axios) {
     queryKey: ['employee', 'me'],
   });
 }
-
-export function useForgotPassword(client: Axios, email: string) {}
