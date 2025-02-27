@@ -180,6 +180,7 @@ const EmployeeOverviewPage: React.FC = () => {
                 </Table>
                 {data !== undefined && (
                   <PaginationWrapper
+                    className={'mt-6'}
                     totalPages={data.totalPages}
                     currentPage={currentPage}
                     onPageChange={setCurrentPage}

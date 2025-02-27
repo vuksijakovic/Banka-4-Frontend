@@ -8,8 +8,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 
 interface PaginationWrapperProps {
+  className?: string;
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
@@ -17,6 +19,7 @@ interface PaginationWrapperProps {
 }
 
 const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
+  className = undefined,
   totalPages,
   currentPage,
   onPageChange,
@@ -30,9 +33,10 @@ const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
     return pages;
   };
   return (
-    <Pagination>
+    <Pagination className={cn(className)}>
       <PaginationContent>
         <PaginationPrevious
+          variant={'secondary'}
           className={'cursor-pointer select-none'}
           onClick={() => {
             if (!disabled && currentPage > 1) onPageChange(currentPage - 1);
@@ -55,6 +59,7 @@ const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
           )
         )}
         <PaginationNext
+          variant={'default'}
           className={'cursor-pointer select-none'}
           onClick={() => {
             if (!disabled && currentPage < totalPages)
