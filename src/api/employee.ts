@@ -19,9 +19,9 @@ export const searchEmployees = async (
     position: string;
   },
   rowsPerPage: number,
-  currentPage: number,
+  currentPage: number
 ) => {
-  let url = `/employee/search?size=${rowsPerPage}&page=${currentPage-1}`;
+  let url = `/employee/search?size=${rowsPerPage}&page=${currentPage - 1}`;
   if (filters.firstName) url += `&firstName=${filters.firstName}`;
   if (filters.lastName) url += `&lastName=${filters.lastName}`;
   if (filters.email) url += `&email=${filters.email}`;

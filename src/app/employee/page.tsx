@@ -52,10 +52,15 @@ const EmployeeOverviewPage: React.FC = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['employees', searchFilters, currentPage, rowsPerPage],
     queryFn: async () => {
-      const response = await searchEmployees(client, searchFilters, rowsPerPage, currentPage);
+      const response = await searchEmployees(
+        client,
+        searchFilters,
+        rowsPerPage,
+        currentPage
+      );
       return response.data;
     },
-      });
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -162,7 +167,12 @@ const EmployeeOverviewPage: React.FC = () => {
                       </TableRow>
                     ) : (
                       employees.map((employee: Employee) => (
-                        <TableRow key={employee.id} onClick={() => router.push(`/employee/${employee.id}/edit`)}>
+                        <TableRow
+                          key={employee.id}
+                          onClick={() =>
+                            router.push(`/employee/${employee.id}/edit`)
+                          }
+                        >
                           <TableCell>{employee.firstName}</TableCell>
                           <TableCell>{employee.lastName}</TableCell>
                           <TableCell>{employee.email}</TableCell>
