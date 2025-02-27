@@ -35,7 +35,10 @@ export default function HttpClientProvider({
 
     /* Install an interceptor that adds the authorization headers.  */
     client.interceptors.request.use(async (v) => {
-      v.headers.Authorization ??= `Bearer ${await state.accessToken}`;
+      const accessToken = await state.accessToken;
+      if (accessToken !== undefined) {
+        v.headers.Authorization ??= `Bearer ${accessToken}`;
+      }
       return v;
     });
 
