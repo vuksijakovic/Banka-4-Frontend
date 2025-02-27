@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useHttpClient } from '@/context/HttpClientContext';
 import { Loader2, Search } from 'lucide-react';
 import { PaginationSection } from '@/components/ui/pagination';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ import GuardBlock from '@/components/GuardBlock';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { searchEmployees } from '@/api/employee';
 
 const employeeSchema = z.object({
   id: z.number(),
@@ -34,31 +36,10 @@ const employeeSchema = z.object({
 
 type Employee = z.infer<typeof employeeSchema>;
 
-const getAccessToken = () => {
-  return sessionStorage.getItem('b4/accessToken'); // Replace with your method of getting the access token
-};
-
-const buildUrl = (
-  filters: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    position: string;
-  },
-  rowsPerPage: number
-) => {
-  let url = `http://localhost:8080/employee/search?size=${rowsPerPage}`;
-  if (filters.first_name) url += `&firstName=${filters.first_name}`;
-  if (filters.last_name) url += `&lastName=${filters.last_name}`;
-  if (filters.email) url += `&email=${filters.email}`;
-  if (filters.position) url += `&position=${filters.position}`;
-  return url;
-};
-
 const EmployeeOverviewPage: React.FC = () => {
   const [filters, setFilters] = useState({
-    first_name: '',
-    last_name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     position: '',
   });
@@ -66,17 +47,14 @@ const EmployeeOverviewPage: React.FC = () => {
   const router = useRouter();
   const rowsPerPage = 8;
 
+  const client = useHttpClient();
+
   const { data, isLoading } = useQuery({
-    queryKey: ['employees'],
+    queryKey: ['employees', currentPage, filters],
     queryFn: async () => {
-      const url = buildUrl(filters, rowsPerPage);
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-      });
-      return response.data;
-    },
+        const response = await searchEmployees(client, filters, rowsPerPage, currentPage);
+        return response.data;
+      },
   });
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,7 +69,7 @@ const EmployeeOverviewPage: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const employees = data?.content;
+  const employees = data?.content || [];
   const totalPages = data?.totalPages || 0;
 
   const { dispatch } = useBreadcrumb();
@@ -121,14 +99,14 @@ const EmployeeOverviewPage: React.FC = () => {
                 type="text"
                 name="first_name"
                 placeholder="filter by first name"
-                value={filters.first_name}
+                value={filters.firstName}
                 onChange={handleFilterChange}
               />
               <Input
                 type="text"
                 name="last_name"
                 placeholder="filter by last name"
-                value={filters.last_name}
+                value={filters.lastName}
                 onChange={handleFilterChange}
               />
               <Input
@@ -152,7 +130,7 @@ const EmployeeOverviewPage: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent className="rounded-lg overflow-hidden">
-            {loading ? (
+            {isLoading ? (
               <div className="flex justify-center p-4">
                 <Loader2 className="animate-spin w-6 h-6" />
               </div>
@@ -160,7 +138,7 @@ const EmployeeOverviewPage: React.FC = () => {
               <>
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow >
                       <TableHead>First Name</TableHead>
                       <TableHead>Last Name</TableHead>
                       <TableHead>Email</TableHead>
@@ -171,7 +149,7 @@ const EmployeeOverviewPage: React.FC = () => {
                   </TableHeader>
 
                   <TableBody>
-                    {currentEmployees.length === 0 ? (
+                    {employees === undefined || employees.length === 0 ? (
                       <TableRow>
                         <TableCell
                           colSpan={6}
@@ -181,12 +159,12 @@ const EmployeeOverviewPage: React.FC = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      currentEmployees.map((employee) => (
-                        <TableRow key={employee.id}>
-                          <TableCell>{employee.first_name}</TableCell>
-                          <TableCell>{employee.last_name}</TableCell>
+                      employees.map((employee : Employee) => (
+                        <TableRow key={employee.id} onClick={() => router.push(`/employee/${employee.id}/edit`)}>
+                          <TableCell>{employee.firstName}</TableCell>
+                          <TableCell>{employee.lastName}</TableCell>
                           <TableCell>{employee.email}</TableCell>
-                          <TableCell>{employee.phone_number}</TableCell>
+                          <TableCell>{employee.phone}</TableCell>
                           <TableCell>{employee.position}</TableCell>
                           <TableCell>
                             {employee.active ? 'Yes' : 'No'}
@@ -200,7 +178,7 @@ const EmployeeOverviewPage: React.FC = () => {
                   pageCount={totalPages}
                   currentPage={currentPage}
                   onChangePage={setCurrentPage}
-                  resultsLength={employees.length}
+                  resultsLength={0}
                   pageSize={rowsPerPage}
                 ></PaginationSection>
               </>
