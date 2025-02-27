@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useParams, useRouter, notFound } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -71,13 +71,13 @@ export default function PasswordPage() {
   });
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Card className="w-full max-w-[348px] bg-white rounded-lg border border-zinc-200 p-4">
+    <div className="flex justify-center items-center pt-16">
+      <Card className="w-full max-w-[348px] rounded-lg border p-4">
         <CardHeader className="w-full p-4 text-left">
-          <h2 className="text-2xl font-semibold text-zinc-950">
+          <h2 className="text-2xl font-semibold">
             {isReset ? 'Reset Your Password' : 'Set Your Password'}
           </h2>
-          <p className="text-sm text-zinc-500 mt-3">
+          <p className="text-sm text-muted-foreground mt-3">
             {isReset
               ? 'Forgot your password? No worries — set a new one to regain secure access to your account.'
               : 'Create a strong, secure password to protect your account and keep your information safe.'}
@@ -136,7 +136,7 @@ export default function PasswordPage() {
               <div className="flex justify-end mt-2">
                 <Button
                   type="submit"
-                  className="bg-zinc-900 text-white rounded-md py-1 px-2 text-sm font-medium flex items-center gap-2"
+                  className="rounded-md py-1 px-2 text-sm font-medium flex items-center gap-2"
                   disabled={isPending}
                 >
                   {isPending ? (
