@@ -15,7 +15,6 @@ import { Loader2, Search } from 'lucide-react';
 import { PaginationSection } from '@/components/ui/pagination';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { mockEmployees } from './mockDataOverview';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
 
@@ -39,7 +38,15 @@ const getAccessToken = () => {
   return sessionStorage.getItem('b4/accessToken'); // Replace with your method of getting the access token
 };
 
-const buildUrl = (filters: { first_name: string; last_name: string; email: string; position: string; }, rowsPerPage: number) => {
+const buildUrl = (
+  filters: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    position: string;
+  },
+  rowsPerPage: number
+) => {
   let url = `http://localhost:8080/employee/search?size=${rowsPerPage}`;
   if (filters.first_name) url += `&firstName=${filters.first_name}`;
   if (filters.last_name) url += `&lastName=${filters.last_name}`;
@@ -69,7 +76,7 @@ const EmployeeOverviewPage: React.FC = () => {
         },
       });
       return response.data;
-    }
+    },
   });
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
