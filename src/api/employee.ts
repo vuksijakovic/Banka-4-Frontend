@@ -15,3 +15,6 @@ export const verifyPassword = async (
   client: Axios,
   data: VerifyPasswordRequest
 ) => client.post<void>('/auth/verify', data);
+
+export const forgotPassword = async (client: Axios, email: string) =>
+  client.get<void>(`/auth/forgot-password/${email}`);

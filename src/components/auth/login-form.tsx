@@ -66,7 +66,7 @@ export default function LoginForm({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-900">Email</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
@@ -83,16 +83,18 @@ export default function LoginForm({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-900">Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="**********"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                  <ForgotPasswordDialog />
+                  <FormLabel>Password</FormLabel>
+                  <div className={'w-full text-end'}>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="**********"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                    <ForgotPasswordDialog />
+                  </div>
                 </FormItem>
               )}
             />
