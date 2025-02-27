@@ -11,5 +11,4 @@ export const postNewEmployee = async (
 ) => client.post<void>('/employee', data);
 
 export const forgotPassword = async (client: Axios, email: string) =>
-    client.get<void>(`/auth/forgot-password/${email}`);
-
+  client.get<void>(`/auth/forgot-password/${email}`);
