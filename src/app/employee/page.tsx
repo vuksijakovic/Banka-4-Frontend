@@ -24,6 +24,8 @@ import { mockEmployees } from './mockDataOverview';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
 
+import { useRouter } from 'next/navigation';
+
 const employeeSchema = z.object({
   id: z.number(),
   first_name: z.string(),
@@ -46,6 +48,7 @@ const EmployeeOverviewPage: React.FC = () => {
     email: '',
     position: '',
   });
+  const router = useRouter();
   const rowsPerPage = 8;
 
   useEffect(() => {
