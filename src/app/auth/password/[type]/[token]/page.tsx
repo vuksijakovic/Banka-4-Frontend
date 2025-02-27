@@ -21,6 +21,7 @@ import {
 import { verifyPassword } from '@/api/employee';
 import { VerifyPasswordRequest } from '@/api/request/auth';
 import axios from 'axios';
+import { toastRequestError } from '@/api/errors';
 
 // Zod schema for password validation
 const passwordSchema = z
@@ -62,9 +63,10 @@ export default function PasswordPage() {
         isReset ? 'Password reset successfully!' : 'Password set successfully!'
       );
       router.replace('/auth/login');
+      toast.success('success');
     },
     onError: (error) => {
-      toast.error(error.message || 'An error occurred.');
+      toastRequestError(error);
     },
   });
 
