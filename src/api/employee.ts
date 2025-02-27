@@ -2,6 +2,7 @@ import { Axios } from 'axios';
 import { MeResponseDto } from './response/MeResponseDto';
 import { NewEmployeeRequest } from '@/api/request/employee';
 import { EmployeeOverviewResponseDto } from '@/api/response/employee';
+import { VerifyPasswordRequest } from '@/api/request/auth';
 
 export const getMe = async (client: Axios) =>
   client.get<MeResponseDto>('/employee/me');
@@ -29,3 +30,11 @@ export const searchEmployees = async (
   if (filters.position) url += `&position=${filters.position}`;
   return client.get<EmployeeOverviewResponseDto>(url);
 };
+
+export const verifyPassword = async (
+  client: Axios,
+  data: VerifyPasswordRequest
+) => client.post<void>('/auth/verify', data);
+
+export const forgotPassword = async (client: Axios, email: string) =>
+  client.get<void>(`/auth/forgot-password/${email}`);
