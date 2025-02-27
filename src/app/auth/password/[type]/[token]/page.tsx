@@ -1,12 +1,15 @@
 'use client';
 
 import { z } from 'zod';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { notFound, useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { Loader } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { notFound, useParams } from 'next/navigation';
 import {
   Form,
   FormControl,
@@ -15,8 +18,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { verifyPassword } from '@/api/employee';
+import { VerifyPasswordRequest } from '@/api/request/auth';
+import { toastRequestError } from '@/api/errors';
+import { useHttpClient } from '@/context/HttpClientContext';
 
-// Zod password validation
+// Zod schema for password validation
 const passwordSchema = z
   .object({
     password: z.string().min(8).max(32),
@@ -34,6 +41,8 @@ type PasswordParams = {
 
 export default function PasswordPage() {
   const params = useParams<PasswordParams>();
+  const client = useHttpClient();
+  const router = useRouter();
 
   if (params.type !== 'set' && params.type !== 'reset') notFound();
 
@@ -47,21 +56,28 @@ export default function PasswordPage() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof passwordSchema>) => {
-    alert(
-      isReset ? 'Password reset successfully!' : 'Password set successfully!'
-    );
-    console.log(values);
-  };
+  const { isPending, mutate: doVerify } = useMutation({
+    mutationFn: async (data: VerifyPasswordRequest) =>
+      verifyPassword(client, data),
+    onSuccess: () => {
+      toast.success(
+        isReset ? 'Password reset successfully!' : 'Password set successfully!'
+      );
+      router.replace('/auth/login');
+    },
+    onError: (error) => {
+      toastRequestError(error);
+    },
+  });
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-[348px] bg-white rounded-lg border border-zinc-200 p-4">
+    <div className="flex justify-center items-center pt-16">
+      <Card className="w-full max-w-[348px] rounded-lg border p-4">
         <CardHeader className="w-full p-4 text-left">
-          <h2 className="text-2xl font-semibold text-zinc-950">
+          <h2 className="text-2xl font-semibold">
             {isReset ? 'Reset Your Password' : 'Set Your Password'}
           </h2>
-          <p className="text-sm text-zinc-500 mt-3">
+          <p className="text-sm text-muted-foreground mt-3">
             {isReset
               ? 'Forgot your password? No worries — set a new one to regain secure access to your account.'
               : 'Create a strong, secure password to protect your account and keep your information safe.'}
@@ -70,7 +86,15 @@ export default function PasswordPage() {
 
         <CardContent className="px-4 pb-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit((values) =>
+                doVerify({
+                  verificationCode: params.token,
+                  password: values.password,
+                })
+              )}
+              className="space-y-4"
+            >
               {/* Password Field */}
               <FormField
                 control={form.control}
@@ -112,9 +136,16 @@ export default function PasswordPage() {
               <div className="flex justify-end mt-2">
                 <Button
                   type="submit"
-                  className="bg-zinc-900 text-white rounded-md py-1 px-2 text-sm font-medium"
+                  className="rounded-md py-1 px-2 text-sm font-medium flex items-center gap-2"
+                  disabled={isPending}
                 >
-                  {isReset ? 'Reset Password' : 'Confirm'}
+                  {isPending ? (
+                    <Loader className="w-4 h-4 animate-spin" /> // 🔥
+                  ) : isReset ? (
+                    'Reset Password'
+                  ) : (
+                    'Confirm'
+                  )}
                 </Button>
               </div>
             </form>
