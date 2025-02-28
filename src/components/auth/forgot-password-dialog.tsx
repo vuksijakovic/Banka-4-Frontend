@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { forgotPassword } from '@/api/auth';
+import { toast } from 'sonner';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),
@@ -43,6 +44,9 @@ export default function ForgotPasswordDialog() {
     mutationFn: async (email: string) =>
       await forgotPassword(httpClient, email),
     onError: (error) => toastRequestError(error),
+    onSuccess: () => {
+      toast('Reset password email sent.');
+    },
   });
 
   const onSubmit = (data: ForgotPasswordValues) => {
