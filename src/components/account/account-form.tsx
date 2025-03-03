@@ -23,11 +23,10 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '../ui/switch';
 
 const formSchema = z.object({
-  amount: z.number().min(1),
+  amount: z.coerce.number().min(1),
   currency: z.string().min(1),
   makeCard: z.boolean(),
 });
-
 export type AccountFormData = {
   amount: number;
   currency: string;
@@ -62,7 +61,7 @@ export default function AccountForm({ onSubmit }: AccountFormProps) {
                 <Input
                   {...field}
                   type="number"
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  onChange={field.onChange}
                   placeholder="Enter amount"
                 />
               </FormControl>
