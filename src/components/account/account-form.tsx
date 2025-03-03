@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Switch } from '../ui/switch';
+import { currencyOptions } from '@/types/currency';
 
 const formSchema = z.object({
   amount: z.coerce.number().min(1),
@@ -84,16 +85,7 @@ export default function AccountForm({ onSubmit }: AccountFormProps) {
                     <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
                   <SelectContent>
-                    {[
-                      'RSD',
-                      'EUR',
-                      'CHF',
-                      'USD',
-                      'GBP',
-                      'JPY',
-                      'CAD',
-                      'AUD',
-                    ].map((currency) => (
+                    {currencyOptions.map((currency) => (
                       <SelectItem key={currency} value={currency}>
                         {currency}
                       </SelectItem>
