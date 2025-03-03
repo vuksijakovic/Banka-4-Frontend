@@ -9,7 +9,7 @@ import bankimglight from './public/bankimglight.png';
 export default function Home() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
+ 
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -18,7 +18,9 @@ export default function Home() {
 
   return (
     <>
+    
       <AppNavigationMenu />
+      
       <div className="flex flex-col md:flex-row items-center justify-between px-20 mt-3">
         <div className="flex flex-col gap-5 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-semibold">
