@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 type ConfirmDialogProps = {
   title?: string;
@@ -23,11 +23,11 @@ type ConfirmDialogProps = {
 export function useConfirmDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [config, setConfig] = useState<ConfirmDialogProps | null>(null);
-  const [triggerKey, setTriggerKey] = useState(0); 
+  const [triggerKey, setTriggerKey] = useState(0);
 
   const confirm = (options: ConfirmDialogProps) => {
     setConfig(options);
-    setTriggerKey((prev) => prev + 1); 
+    setTriggerKey((prev) => prev + 1);
     setIsOpen(true);
   };
 
@@ -43,17 +43,22 @@ export function useConfirmDialog() {
 
   const Dialog = (
     <>
-     
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogTrigger key={triggerKey} className="hidden" />
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{config?.title || "Are you sure?"}</AlertDialogTitle>
-            <AlertDialogDescription>{config?.description || "This action cannot be undone."}</AlertDialogDescription>
+            <AlertDialogTitle>
+              {config?.title || 'Are you sure?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {config?.description || 'This action cannot be undone.'}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>Confirm</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirm}>
+              Confirm
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
