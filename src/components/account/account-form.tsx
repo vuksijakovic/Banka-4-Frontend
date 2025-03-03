@@ -19,8 +19,8 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import { Switch } from '../ui/switch';
 
 const formSchema = z.object({
   amount: z.number().min(1),
@@ -111,15 +111,18 @@ export default function AccountForm({ onSubmit }: AccountFormProps) {
           control={form.control}
           name="makeCard"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-2">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
+            <div className="flex items-center gap-2">
+              <FormItem>
+                <FormControl>
+                  <Switch
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               <FormLabel>Make a card</FormLabel>
-            </FormItem>
+            </div>
           )}
         />
 
