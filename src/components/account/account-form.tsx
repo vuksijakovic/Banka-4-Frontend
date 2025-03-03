@@ -123,9 +123,7 @@ export default function AccountForm({ onSubmit }: AccountFormProps) {
           )}
         />
 
-        <Button type="submit" className="col-span-2 w-full">
-          Submit
-        </Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   );
