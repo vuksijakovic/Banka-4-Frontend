@@ -25,13 +25,13 @@ import { Button } from '@/components/ui/button';
 const formSchema = z.object({
   amount: z.number().min(1),
   currency: z.string().min(1),
-  makeCard: z.boolean().optional(),
+  makeCard: z.boolean(),
 });
 
 export type AccountFormData = {
   amount: number;
   currency: string;
-  makeCard?: boolean;
+  makeCard: boolean;
 };
 
 interface AccountFormProps {
