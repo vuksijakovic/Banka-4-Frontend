@@ -27,20 +27,22 @@ const formSchema = z.object({
   currency: z.string().min(1),
   makeCard: z.boolean().optional(),
 });
+
 export type AccountFormData = {
   amount: number;
   currency: string;
   makeCard?: boolean;
 };
-export default function AccountForm() {
+
+interface AccountFormProps {
+  onSubmit: (data: AccountFormData) => void;
+}
+
+export default function AccountForm({ onSubmit }: AccountFormProps) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: { amount: 0, currency: '', makeCard: false },
   });
-
-  const onSubmit = (data: AccountFormData) => {
-    console.log('Form submitted', data);
-  };
 
   return (
     <Form {...form}>
@@ -121,7 +123,7 @@ export default function AccountForm() {
           )}
         />
 
-        <Button type="submit" className="col-span-2">
+        <Button type="submit" className="col-span-2 w-full">
           Submit
         </Button>
       </form>
