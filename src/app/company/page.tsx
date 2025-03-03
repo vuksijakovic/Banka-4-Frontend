@@ -17,13 +17,13 @@ export default function CompanyPage() {
     },
     onSuccess: () => {
       toast.success('Company added successfully');
-      router.push('/companies');
+      ///router.push('/companies');
     },
   });
 
   return (
     <div className="flex justify-center items-center pt-16">
-      <CompanyForm enabled={!isPending} onSubmitAction={addCompany} />
+      <CompanyForm isPending={!isPending} onSubmitAction={addCompany} />
     </div>
   );
 }
