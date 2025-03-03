@@ -2,13 +2,13 @@
 
 import CompanyForm, {
   CompanyFormData,
-} from '@/components/company/comapny-form';
+} from '@/components/company/company-form';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
 export default function CompanyPage() {
-  const router = useRouter();
+  const _router = useRouter();
 
   const { isPending, mutate: addCompany } = useMutation({
     mutationFn: async (_data: CompanyFormData) => {},

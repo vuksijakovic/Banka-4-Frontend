@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combobox';
-import {activityCodes} from "@/lib/activity-codes";
+import { activityCodes } from '@/lib/activity-codes';
 
 const formSchema = z.object({
   name: z.string().nonempty(),
@@ -61,7 +61,9 @@ export default function CompanyForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name <span className="text-red-500 text-xl">*</span></FormLabel>
+              <FormLabel>
+                Name <span className="text-red-500 text-xl">*</span>
+              </FormLabel>
               <FormControl>
                 <Input type="text" placeholder="Company Name" {...field} />
               </FormControl>
@@ -75,7 +77,9 @@ export default function CompanyForm({
           name="tin"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>TIN <span className="text-red-500 text-xl">*</span></FormLabel>
+              <FormLabel>
+                TIN <span className="text-red-500 text-xl">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="text"
@@ -93,7 +97,9 @@ export default function CompanyForm({
           name="crn"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>CRN <span className="text-red-500 text-xl">*</span></FormLabel>
+              <FormLabel>
+                CRN <span className="text-red-500 text-xl">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
                   type="text"
@@ -111,7 +117,9 @@ export default function CompanyForm({
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Address <span className="text-red-500 text-xl">*</span></FormLabel>
+              <FormLabel>
+                Address <span className="text-red-500 text-xl">*</span>
+              </FormLabel>
               <FormControl>
                 <Input type="text" placeholder="Company Address" {...field} />
               </FormControl>
@@ -125,7 +133,9 @@ export default function CompanyForm({
           name="activityCode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Activity Code <span className="text-red-500 text-xl">*</span></FormLabel>
+              <FormLabel>
+                Activity Code <span className="text-red-500 text-xl">*</span>
+              </FormLabel>
               <FormControl>
                 <Combobox
                   options={activityCodes}
