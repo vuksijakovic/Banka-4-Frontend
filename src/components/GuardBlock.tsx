@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import { redirect } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
 import { Privilege } from '@/types/privileges';
 import { useMe } from '@/hooks/use-me';
 
@@ -16,6 +16,7 @@ const GuardBlock: React.FC<GuardBlockProps> = ({
 }) => {
   // Fetch user data (including permissions) via React Query.
   const me = useMe();
+  const pathname = usePathname();
 
   /*
       useEffect(() => {
@@ -36,6 +37,8 @@ const GuardBlock: React.FC<GuardBlockProps> = ({
   // Privileges of current user
   const userPrivileges = me.me.privileges;
 
+  const userType = me.type;
+
   // Check if the user has all required privileges.
   const hasPermissions = requiredPrivileges.every((privilege) =>
     userPrivileges.includes(privilege)
@@ -44,6 +47,12 @@ const GuardBlock: React.FC<GuardBlockProps> = ({
   // If the user lacks the required privileges, redirect them outside.
   if (!hasPermissions) {
     redirect('/');
+  }
+
+  if (pathname.startsWith('/e/') && userType === 'client') {
+    redirect('/c/');
+  } else if (pathname.startsWith('/c/') && userType === 'employee') {
+    redirect('/e/');
   }
 
   return <>{children}</>;
