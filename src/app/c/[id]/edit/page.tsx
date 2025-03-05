@@ -20,7 +20,6 @@ import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
 import { EditClientRequest } from '@/api/request/client';
 import { getClientById, updateClientById } from '@/api/client';
-import { Gender, normalizeGender } from '@/types/gender';
 
 type EditClientParams = {
   id: string;
@@ -76,8 +75,6 @@ export default function EditClientPage() {
     return;
   }
 
-  const gender: Gender = normalizeGender(data.gender);
-
   const clientForEdit: ClientFormValues = {
     firstName: data.firstName,
     lastName: data.lastName,
@@ -85,7 +82,7 @@ export default function EditClientPage() {
     email: data.email,
     phoneNumber: data.phone,
     address: data.address,
-    gender: gender,
+    gender: data.gender,
     privilege: data.privileges,
   };
 

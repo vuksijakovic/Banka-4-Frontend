@@ -20,7 +20,6 @@ import { toast } from 'sonner';
 import { useEffect } from 'react';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
-import { Gender, normalizeGender } from '@/types/gender';
 
 type EditEmployeeParams = {
   id: string;
@@ -76,8 +75,6 @@ export default function EditEmployeePage() {
     return;
   }
 
-  const gender: Gender = normalizeGender(data.gender);
-
   const employee: EmployeeFormValues = {
     firstName: data.firstName,
     lastName: data.lastName,
@@ -88,7 +85,7 @@ export default function EditEmployeePage() {
     position: data.position,
     username: data.username,
     department: data.department,
-    gender: gender,
+    gender: data.gender,
     active: data.active,
     privilege: data.privileges,
   };

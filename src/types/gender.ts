@@ -1,7 +1,3 @@
-export type Gender = 'male' | 'female';
+export type Gender = 'Male' | 'Female';
 
-export const genderValues = ['male', 'female'] as const;
-
-export function normalizeGender(gender: string): Gender {
-  return gender.toLowerCase() === 'male' ? 'male' : 'female';
-}
+export const genderValues = ['Male', 'Female'] as const;
