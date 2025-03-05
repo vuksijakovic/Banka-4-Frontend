@@ -28,11 +28,8 @@ const formSchema = z.object({
   currency: z.string().min(1),
   makeCard: z.boolean(),
 });
-export type AccountFormData = {
-  amount: number;
-  currency: string;
-  makeCard: boolean;
-};
+
+export type AccountFormData = z.infer<typeof formSchema>;
 
 interface AccountFormProps {
   onSubmit: (data: AccountFormData) => void;
