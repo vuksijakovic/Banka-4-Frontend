@@ -29,6 +29,7 @@ import { SomePartial } from '@/types/utils';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { getDirtyValues } from '@/lib/form-utils';
 import { ALL_PRIVILEGES, ALL_PRIVILEGES_ } from '@/types/privileges';
+import { genderValues } from '@/types/gender';
 
 const formSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -39,7 +40,7 @@ const formSchema = z.object({
     .string()
     .regex(/^(\+3816|06)(\d{7,8}|(77|78)\d{5,6})$/, 'Invalid phone number'),
   address: z.string().min(1, 'Address is required'),
-  gender: z.enum(['male', 'female'], { required_error: 'Gender is required' }),
+  gender: z.enum(genderValues, { required_error: 'Gender is required' }),
   privilege: z.union([z.tuple([]), z.array(z.enum(ALL_PRIVILEGES_))]),
 });
 

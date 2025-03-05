@@ -1,3 +1,4 @@
+import { Gender } from '@/types/gender';
 import { Privilege } from '@/types/privileges';
 
 export interface NewClientRequest {
@@ -7,7 +8,7 @@ export interface NewClientRequest {
   email: string;
   phoneNumber: string;
   address: string;
-  gender: string;
+  gender: Gender;
   privilege: Privilege[];
 }
 
