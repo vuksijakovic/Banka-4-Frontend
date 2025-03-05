@@ -19,6 +19,7 @@ export default function Home() {
   return (
     <>
       <AppNavigationMenu />
+
       <div className="flex flex-col md:flex-row items-center justify-between px-20 mt-3">
         <div className="flex flex-col gap-5 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-semibold">
