@@ -28,13 +28,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SomePartial } from '@/types/utils';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { getDirtyValues } from '@/lib/form-utils';
-
-const CLIENT_PRIVILEGES = [
-  'FILTER',
-  'SEARCH',
-  'TRADE_STOCKS',
-  'VIEW_STOCKS',
-] as const;
+import { CLIENT_PRIVILEGES, CLIENT_PRIVILEGES_ } from '@/types/privileges';
 
 const formSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -46,7 +40,7 @@ const formSchema = z.object({
     .regex(/^(\+3816|06)(\d{7,8}|(77|78)\d{5,6})$/, 'Invalid phone number'),
   address: z.string().min(1, 'Address is required'),
   gender: z.enum(['male', 'female'], { required_error: 'Gender is required' }),
-  privilege: z.union([z.tuple([]), z.array(z.enum(CLIENT_PRIVILEGES))]),
+  privilege: z.union([z.tuple([]), z.array(z.enum(CLIENT_PRIVILEGES_))]),
 });
 
 export type ClientFormAction =

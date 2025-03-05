@@ -11,11 +11,14 @@ const ALL_PRIVILEGES_ = [
   'NEW_INSURANCES',
 ] as const;
 
-const CLIENT_PRIVILEGES_ = [
+export const CLIENT_PRIVILEGES_ = [
+  'ADMIN',
   'FILTER',
   'SEARCH',
   'TRADE_STOCKS',
   'VIEW_STOCKS',
+  'CONTRACTS',
+  'NEW_INSURANCES',
 ] as const;
 
 export type Privilege = (typeof ALL_PRIVILEGES_)[number];
