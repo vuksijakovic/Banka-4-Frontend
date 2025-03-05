@@ -1,4 +1,5 @@
-import { Privilege } from '@/types/privileges';
+import { Pageable } from '@/types/pageable';
+import { ClientPrivilege } from '@/types/privileges';
 
 export interface ClientResponseDto {
   id: string;
@@ -9,6 +10,7 @@ export interface ClientResponseDto {
   email: string;
   phone: string;
   address: string;
-  privileges: Privilege[];
+  privileges: ClientPrivilege[];
   // TODO(marko): add accounts field
 }
+export type ClientOverviewResponseDto = Pageable<ClientResponseDto>;
