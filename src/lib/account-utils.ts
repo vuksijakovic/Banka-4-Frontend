@@ -13,7 +13,7 @@ export const formatAccountNumber = (accountNumber: string): string => {
   const accountType = R.pipe(accountNumber.split(''), R.takeLast(2)).join('');
   const accountSeed = R.pipe(accountNumber.split(''), R.drop(3), R.dropLast(2))
     .join('')
-    .padStart(9, '0');
+    .padStart(13, '0');
 
   return `${bankId}-${accountSeed}-${accountType}`;
 };
