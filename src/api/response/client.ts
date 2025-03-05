@@ -1,5 +1,4 @@
 import { Gender } from '@/types/gender';
-import { Pageable } from '@/types/pageable';
 import { Privilege } from '@/types/privileges';
 
 export interface ClientResponseDto {
