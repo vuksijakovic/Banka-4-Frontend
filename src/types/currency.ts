@@ -1,12 +1,20 @@
-export enum Currency {
-  RSD = 'RSD',
-  EUR = 'EUR',
-  CHF = 'CHF',
-  USD = 'USD',
-  GBP = 'GBP',
-  JPY = 'JPY',
-  CAD = 'CAD',
-  AUD = 'AUD',
-}
+export type Currency =
+  | 'RSD'
+  | 'EUR'
+  | 'CHF'
+  | 'USD'
+  | 'GBP'
+  | 'JPY'
+  | 'CAD'
+  | 'AUD';
 
-export const currencyOptions = Object.values(Currency);
+export const currencyOptions: Currency[] = [
+  'RSD',
+  'EUR',
+  'CHF',
+  'USD',
+  'GBP',
+  'JPY',
+  'CAD',
+  'AUD',
+];
