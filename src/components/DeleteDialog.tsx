@@ -19,14 +19,21 @@ export type DeleteDialogProps = {
   itemName?: string;
 };
 
-export const DeleteDialog = ({ open, onConfirm, onCancel, itemName }: DeleteDialogProps) => {
+export const DeleteDialog = ({
+  open,
+  onConfirm,
+  onCancel,
+  itemName,
+}: DeleteDialogProps) => {
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete {itemName ? `"${itemName}"` : 'this item'}? This action cannot be undone.
+            Are you sure you want to delete{' '}
+            {itemName ? `"${itemName}"` : 'this item'}? This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
