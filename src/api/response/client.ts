@@ -14,5 +14,3 @@ export interface ClientResponseDto {
   privileges: Privilege[];
   // TODO(marko): add accounts field
 }
-
-export type ClientOverviewResponseDto = Pageable<ClientResponseDto>;
