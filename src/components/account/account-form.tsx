@@ -25,7 +25,7 @@ import { currencyOptions } from '@/types/currency';
 
 const formSchema = z.object({
   amount: z.coerce.number().min(1),
-  currency: z.string().min(1),
+  currency: z.enum(currencyOptions),
   makeCard: z.boolean(),
 });
 
@@ -36,9 +36,9 @@ interface AccountFormProps {
 }
 
 export default function AccountForm({ onSubmit }: AccountFormProps) {
-  const form = useForm({
+  const form = useForm<AccountFormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: { amount: 0, currency: '', makeCard: false },
+    defaultValues: { amount: 0, currency: 'RSD', makeCard: false },
   });
 
   return (

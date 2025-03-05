@@ -8,7 +8,7 @@ export type Currency =
   | 'CAD'
   | 'AUD';
 
-export const currencyOptions: Currency[] = [
+export const currencyOptions = [
   'RSD',
   'EUR',
   'CHF',
@@ -17,4 +17,4 @@ export const currencyOptions: Currency[] = [
   'JPY',
   'CAD',
   'AUD',
-];
+] as const;
