@@ -10,6 +10,7 @@ import {
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { useRouter } from 'next/navigation';
 import ClientFilterTable from '@/components/client/client-filter-table';
+import GuardBlock from '@/components/GuardBlock';
 
 const ClientOverviewPage: React.FC = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const ClientOverviewPage: React.FC = () => {
     dispatch({
       type: 'SET_BREADCRUMB',
       items: [
-        { title: 'Home', url: '/' },
+        { title: 'Home', url: '/e' },
         { title: 'Clients', url: '/e/client' },
         { title: 'Overview' },
       ],
@@ -26,22 +27,24 @@ const ClientOverviewPage: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <div className="p-8">
-      <Card className="max-w-[900px] mx-auto">
-        <CardHeader>
-          <h1 className="text-2xl font-bold">Clients Overview</h1>
-          <CardDescription>
-            This table provides a clear and organized overview of key client
-            details for quick reference and easy access.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="rounded-lg overflow-hidden">
-          <ClientFilterTable
-            onRowClick={(c) => router.push(`/e/client/${c.id}/edit`)}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <GuardBlock requiredUserType={'employee'}>
+      <div className="p-8">
+        <Card className="max-w-[900px] mx-auto">
+          <CardHeader>
+            <h1 className="text-2xl font-bold">Clients Overview</h1>
+            <CardDescription>
+              This table provides a clear and organized overview of key client
+              details for quick reference and easy access.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="rounded-lg overflow-hidden">
+            <ClientFilterTable
+              onRowClick={(c) => router.push(`/e/client/${c.id}/edit`)}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </GuardBlock>
   );
 };
 

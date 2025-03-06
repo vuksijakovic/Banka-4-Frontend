@@ -3,6 +3,7 @@ import { TransactionDto } from '@/api/response/transaction';
 import { PaymentFilters, searchPayments } from '@/api/transaction';
 import { DataTable } from '@/components/dataTable/DataTable';
 import FilterBar from '@/components/filters/FilterBar';
+import GuardBlock from '@/components/GuardBlock';
 import { TransactionDialog } from '@/components/transaction/TransactionDialog';
 import {
   Card,
@@ -38,7 +39,7 @@ export default function TransactionsPage() {
     dispatch({
       type: 'SET_BREADCRUMB',
       items: [
-        { title: 'Home', url: '/' },
+        { title: 'Home', url: '/c' },
         { title: 'Transactions', url: '/c/transactions' },
         { title: 'Overview' },
       ],
@@ -70,48 +71,50 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="p-8">
-      <style>{'th, td {white-space: nowrap;}'}</style>
-      <TransactionDialog
-        dto={selectedTransaction}
-        open={modalOpen}
-        setOpen={setModalOpen}
-      />
-      <Card className="max-w-[900px] mx-auto">
-        <CardHeader>
-          <h1 className="text-2xl font-bold">Transactions Overview</h1>
-          <CardDescription>
-            This table provides a clear and organized overview of key
-            transaction details for quick reference and easy access.
-          </CardDescription>
-          {/* TODO: date, enum and number filters */}
-          <FilterBar<PaymentFilters>
-            filterKeyToName={transactionFilterKeyToName}
-            onSearch={(filter) => {
-              setPage(0);
-              setPaymentFilters(filter);
-            }}
-            filter={paymentFilters}
-          />
-        </CardHeader>
-        <CardContent className="rounded-lg overflow-hidden">
-          <DataTable
-            onRowClick={(row) => {
-              setSelectedTransaction(row.original);
-              setModalOpen(true);
-            }}
-            columns={transactionColumns}
-            data={data?.content ?? []}
-            isLoading={isLoading}
-            pageCount={data?.page.totalPages ?? 0}
-            pagination={{ page: page, pageSize }}
-            onPaginationChange={(newPagination) => {
-              setPage(newPagination.page);
-              setPageSize(newPagination.pageSize);
-            }}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <GuardBlock requiredUserType={'client'}>
+      <div className="p-8">
+        <style>{'th, td {white-space: nowrap;}'}</style>
+        <TransactionDialog
+          dto={selectedTransaction}
+          open={modalOpen}
+          setOpen={setModalOpen}
+        />
+        <Card className="max-w-[900px] mx-auto">
+          <CardHeader>
+            <h1 className="text-2xl font-bold">Transactions Overview</h1>
+            <CardDescription>
+              This table provides a clear and organized overview of key
+              transaction details for quick reference and easy access.
+            </CardDescription>
+            {/* TODO: date, enum and number filters */}
+            <FilterBar<PaymentFilters>
+              filterKeyToName={transactionFilterKeyToName}
+              onSearch={(filter) => {
+                setPage(0);
+                setPaymentFilters(filter);
+              }}
+              filter={paymentFilters}
+            />
+          </CardHeader>
+          <CardContent className="rounded-lg overflow-hidden">
+            <DataTable
+              onRowClick={(row) => {
+                setSelectedTransaction(row.original);
+                setModalOpen(true);
+              }}
+              columns={transactionColumns}
+              data={data?.content ?? []}
+              isLoading={isLoading}
+              pageCount={data?.page.totalPages ?? 0}
+              pagination={{ page: page, pageSize }}
+              onPaginationChange={(newPagination) => {
+                setPage(newPagination.page);
+                setPageSize(newPagination.pageSize);
+              }}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </GuardBlock>
   );
 }

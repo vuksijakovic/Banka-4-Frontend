@@ -70,7 +70,7 @@ const AccountOverviewPage: React.FC = () => {
     dispatch({
       type: 'SET_BREADCRUMB',
       items: [
-        { title: 'Home', url: '/' },
+        { title: 'Home', url: '/e' },
         { title: 'Accounts', url: '/e/accounts' },
         { title: 'Overview' },
       ],

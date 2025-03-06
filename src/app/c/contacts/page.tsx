@@ -14,8 +14,8 @@ import FilterBar from '@/components/filters/FilterBar';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import {
-  createContactsColumns,
   ContactResponseDto,
+  createContactsColumns,
 } from '@/ui/dataTables/contacts/contactsColumns';
 import ContactForm, {
   ContactFormAction,
@@ -24,6 +24,7 @@ import { DeleteDialog } from '@/components/DeleteDialog';
 import { useQuery } from '@tanstack/react-query';
 import { useHttpClient } from '@/context/HttpClientContext';
 import { searchContacts } from '@/api/contact';
+import GuardBlock from '@/components/GuardBlock';
 
 interface ContactFilter {
   name: string;
@@ -61,8 +62,8 @@ const ContactsPage: React.FC = () => {
     dispatch({
       type: 'SET_BREADCRUMB',
       items: [
-        { title: 'Home', url: '/' },
-        { title: 'Contacts', url: '/contacts' },
+        { title: 'Home', url: '/c' },
+        { title: 'Contacts', url: '/c/contacts' },
         { title: 'Overview' },
       ],
     });
@@ -118,7 +119,7 @@ const ContactsPage: React.FC = () => {
   const columns = createContactsColumns(handleEdit, handleDelete);
 
   return (
-    <>
+    <GuardBlock requiredUserType={'client'}>
       <div className="p-8">
         <Card className="max-w-[900px] mx-auto">
           <CardHeader>
@@ -193,7 +194,7 @@ const ContactsPage: React.FC = () => {
           }}
         />
       )}
-    </>
+    </GuardBlock>
   );
 };
 

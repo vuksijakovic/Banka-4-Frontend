@@ -5,7 +5,7 @@ import TransferForm from '@/components/transfer/transfer-form';
 import { postNewTransfer } from '@/api/transfer';
 import { AccountDto } from '@/api/response/account';
 import { useHttpClient } from '@/context/HttpClientContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/card';
 import { getAccounts } from '@/api/account';
 import { toastRequestError } from '@/api/errors';
+import GuardBlock from '@/components/GuardBlock';
+import { useBreadcrumb } from '@/context/BreadcrumbContext';
 
 interface TransferData {
   fromAccount: string;
@@ -24,6 +26,17 @@ interface TransferData {
 }
 
 export default function TransferPage() {
+  const { dispatch } = useBreadcrumb();
+  useEffect(() => {
+    dispatch({
+      type: 'SET_BREADCRUMB',
+      items: [
+        { title: 'Home', url: '/c' },
+        { title: 'Transactions', url: '/c/transactions' },
+        { title: 'New Transfer' },
+      ],
+    });
+  }, [dispatch]);
   const client = useHttpClient();
 
   const {
@@ -53,25 +66,27 @@ export default function TransferPage() {
   };
 
   return (
-    <div className="flex justify-center items-center pt-12">
-      <Card>
-        <CardHeader>
-          <CardTitle>Transfer Funds</CardTitle>
-          <CardDescription>
-            Fill in the details below to transfer funds between accounts.
-          </CardDescription>
-        </CardHeader>
+    <GuardBlock requiredUserType={'client'}>
+      <div className="flex justify-center items-center pt-12">
+        <Card>
+          <CardHeader>
+            <CardTitle>Transfer Funds</CardTitle>
+            <CardDescription>
+              Fill in the details below to transfer funds between accounts.
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent>
-          <TransferForm accounts={accounts} onSubmit={handleTransferSubmit} />
-        </CardContent>
+          <CardContent>
+            <TransferForm accounts={accounts} onSubmit={handleTransferSubmit} />
+          </CardContent>
 
-        <CardFooter>
-          <p className="text-sm text-muted-foreground">
-            Transaction details are required to process the transfer.
-          </p>
-        </CardFooter>
-      </Card>
-    </div>
+          <CardFooter>
+            <p className="text-sm text-muted-foreground">
+              Transaction details are required to process the transfer.
+            </p>
+          </CardFooter>
+        </Card>
+      </div>
+    </GuardBlock>
   );
 }

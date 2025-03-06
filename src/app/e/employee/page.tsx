@@ -73,7 +73,7 @@ const EmployeeOverviewPage: React.FC = () => {
     dispatch({
       type: 'SET_BREADCRUMB',
       items: [
-        { title: 'Home', url: '/' },
+        { title: 'Home', url: '/e' },
         { title: 'Employees', url: '/e/employee' },
         { title: 'Overview' },
       ],
@@ -81,7 +81,7 @@ const EmployeeOverviewPage: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <GuardBlock requiredPrivileges={['ADMIN']}>
+    <GuardBlock requiredUserType={'employee'} requiredPrivileges={['ADMIN']}>
       <div className="p-8">
         <Card className="max-w-[900px] mx-auto">
           <CardHeader>

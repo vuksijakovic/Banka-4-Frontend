@@ -2,10 +2,9 @@
 
 import { TransactionDto } from '@/api/response/transaction';
 import { AccountDto } from '@/api/response/account';
-import { ColumnDef } from '@tanstack/react-table';
 import { fetchTransactions } from '@/api/transactions';
 import { fetchAccounts } from '@/api/accounts';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AccountCarousel } from '@/components/account/account-carousel';
 import { DataTable } from '@/components/dataTable/DataTable';
 import { useQuery } from '@tanstack/react-query';
@@ -18,8 +17,18 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { transactionColumns } from '@/ui/dataTables/transactions/transactionColumns';
+import GuardBlock from '@/components/GuardBlock';
+import { useBreadcrumb } from '@/context/BreadcrumbContext';
 
 const ClientHomePage: React.FC = () => {
+  const { dispatch } = useBreadcrumb();
+  useEffect(() => {
+    dispatch({
+      type: 'SET_BREADCRUMB',
+      items: [{ title: 'Home' }],
+    });
+  }, [dispatch]);
+
   const [selectedAccount, setSelectedAccount] = useState<AccountDto | null>(
     null
   );
@@ -35,13 +44,8 @@ const ClientHomePage: React.FC = () => {
 
   const { data: transactions } = useQuery<TransactionDto[]>({
     queryKey: ['transactions', selectedAccount?.accountNumber],
-    queryFn: async () => {
-      const response = await fetchTransactions(
-        client,
-        selectedAccount?.accountNumber
-      );
-      return response;
-    },
+    queryFn: async () =>
+      await fetchTransactions(client, selectedAccount?.accountNumber),
     enabled: !!selectedAccount,
   });
 
@@ -52,7 +56,7 @@ const ClientHomePage: React.FC = () => {
   }, [accounts, selectedAccount]);
 
   return (
-    <div>
+    <GuardBlock requiredUserType={'client'}>
       {accounts && (
         <AccountCarousel
           items={accounts.map((account) => ({
@@ -98,7 +102,7 @@ const ClientHomePage: React.FC = () => {
           </Card>
         </div>
       )}
-    </div>
+    </GuardBlock>
   );
 };
 

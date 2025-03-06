@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { EditClientRequest } from '@/api/request/client';
 import { getClientById, updateClientById } from '@/api/client';
+import GuardBlock from '@/components/GuardBlock';
 
 type EditClientParams = {
   id: string;
@@ -44,7 +45,7 @@ export default function EditClientPage() {
     dispatch({
       type: 'SET_BREADCRUMB',
       items: [
-        { title: 'Home', url: '/' },
+        { title: 'Home', url: '/e' },
         { title: 'Clients', url: '/e/client' },
         { title: 'Edit' },
       ],
@@ -95,21 +96,23 @@ export default function EditClientPage() {
   }
 
   return (
-    <div className="flex justify-center items-center pt-16">
-      <Card className="w-[800px]">
-        <CardHeader>
-          <CardTitle>Edit Client Details</CardTitle>
-          <CardDescription>Update the client’s information.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ClientForm
-            isUpdate={true}
-            isPending={isPendingFetch || isPendingUpdate}
-            onSubmitAction={onSubmit}
-            defaultValues={clientForEdit}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <GuardBlock requiredUserType={'employee'}>
+      <div className="flex justify-center items-center pt-16">
+        <Card className="w-[800px]">
+          <CardHeader>
+            <CardTitle>Edit Client Details</CardTitle>
+            <CardDescription>Update the client’s information.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ClientForm
+              isUpdate={true}
+              isPending={isPendingFetch || isPendingUpdate}
+              onSubmitAction={onSubmit}
+              defaultValues={clientForEdit}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </GuardBlock>
   );
 }
