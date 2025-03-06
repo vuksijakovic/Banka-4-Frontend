@@ -291,11 +291,11 @@ export default function EmployeeForm({
                   className="flex space-x-4 pt-3"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="r1" />
+                    <RadioGroupItem value="Male" id="r1" />
                     <Label htmlFor="r1">Male</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="r2" />
+                    <RadioGroupItem value="Female" id="r2" />
                     <Label htmlFor="r2">Female</Label>
                   </div>
                 </RadioGroup>
