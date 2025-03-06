@@ -108,7 +108,10 @@ const ClientHomePage: React.FC = () => {
                 data={transactions?.content ?? []}
                 isLoading={isLoading}
                 pagination={{ page, pageSize }}
-                onPaginationChange={() => {}}
+                onPaginationChange={(pagination) => {
+                  setPage(pagination.page);
+                  setPageSize(pagination.pageSize);
+                }}
                 pageCount={transactions?.page.totalPages ?? 0}
               />
             </CardContent>
