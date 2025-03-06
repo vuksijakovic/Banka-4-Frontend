@@ -6,6 +6,22 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 const KNOWN_BACKEND_ERRORS = [
+  'AccountNotFound',
+  'ClientNotFound',
+  'CompanyNotFound',
+  'ContactNotFound',
+  'DuplicateCompanyName',
+  'DuplicateCrn',
+  'DuplicateTin',
+  'EmployeeNotFound',
+  'InsufficientFunds',
+  'InvalidCurrency',
+  'NonexistantSortByField',
+  'NotAccountOwner',
+  'NullPageRequest',
+  'RouteNotFound',
+  'TransactionNotFound',
+  'UserNotFound',
   'DuplicateEmail',
   'DuplicateUsername',
   'IncorrectCredentials',
@@ -56,6 +72,24 @@ export type GeneralAPIError =
     };
 
 export const apiErrorMessages: Readonly<Record<KnownBackendErrors, string>> = {
+  AccountNotFound: "The account you're looking for doesn't exist.",
+  ClientNotFound: 'Client information could not be found.',
+  CompanyNotFound: 'The specified company was not found.',
+  ContactNotFound: 'No contact details were found.',
+  DuplicateCompanyName: 'A company with this name already exists.',
+  DuplicateCrn: 'This company registration number is already in use.',
+  DuplicateTin: 'This tax identification number is already registered.',
+  EmployeeNotFound: 'The requested employee could not be found.',
+  InsufficientFunds:
+    'Your account has insufficient funds to complete this transaction.',
+  InvalidCurrency: 'The selected currency is not supported.',
+  NonexistantSortByField: "The field you're trying to sort by does not exist.",
+  NotAccountOwner: "You don't have permission to access this account.",
+  NullPageRequest:
+    'Invalid page request. Please provide valid pagination details.',
+  RouteNotFound: 'The requested route could not be found.',
+  TransactionNotFound: 'The specified transaction does not exist.',
+  UserNotFound: 'The user could not be found.',
   DuplicateEmail: 'The email you provided is already taken',
   DuplicateUsername: 'The username you provided is already taken',
   IncorrectCredentials: 'Incorrect credentials',
