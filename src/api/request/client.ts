@@ -1,7 +1,7 @@
 export interface CreatePaymentRequest {
   fromAccount: string;
   toAccount: string;
-  amount: number;
+  fromAmount: number;
   recipient: string;
   paymentCode: string;
   referenceNumber: string;

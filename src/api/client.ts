@@ -6,7 +6,10 @@ export const createPayment = async (
   client: Axios,
   data: CreatePaymentRequest
 ): Promise<PaymentResponseDto> => {
-  const response = await client.post<PaymentResponseDto>('/payment', data);
+  const response = await client.post<PaymentResponseDto>(
+    '/transaction/payment',
+    data
+  );
   return response.data;
 };
 

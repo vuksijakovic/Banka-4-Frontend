@@ -15,7 +15,9 @@ import { Toaster, toast } from 'sonner';
 import { PaymentResponseDto } from '@/api/response/client';
 
 export default function NewPaymentPage() {
-  const [recipients] = useState<RecipientDto[]>([]);
+  const [recipients] = useState<RecipientDto[]>(
+    []
+  ); /* TODO(marko): implement get recipients endpoint (when backend implements it...) */
   const [isPending, setIsPending] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [paymentData, setPaymentData] =
@@ -33,6 +35,7 @@ export default function NewPaymentPage() {
     setIsDialogOpen(true);
   };
 
+  /* TODO(marko): fix this once backend implements 2FA; no point in doing it now since the whole logic will change then */
   const handleDialogSubmit = async (otp: string) => {
     if (!paymentData) return;
 
@@ -43,7 +46,7 @@ export default function NewPaymentPage() {
         fromAccount: paymentData.payerAccount,
         toAccount: paymentData.recipientAccount,
         recipient: paymentData.recipientName,
-        amount: paymentData.amount,
+        fromAmount: paymentData.amount,
         paymentCode: paymentData.paymentCode,
         paymentPurpose: paymentData.paymentPurpose,
         referenceNumber: paymentData.referenceNumber ?? '',
