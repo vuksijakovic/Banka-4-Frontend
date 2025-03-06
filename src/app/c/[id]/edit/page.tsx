@@ -1,8 +1,8 @@
 'use client';
-import EmployeeForm, {
-  EmployeeFormValues,
-  EmployeeFormAction,
-} from '@/components/employee/employee-form';
+import ClientForm, {
+  ClientFormValues,
+  ClientFormAction,
+} from '@/components/client/client-form';
 import {
   Card,
   CardContent,
@@ -13,19 +13,19 @@ import {
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { getEmployeeById, updateEmployeeById } from '@/api/employee';
 import { toastRequestError } from '@/api/errors';
-import { EditEmployeeRequest } from '@/api/request/employee';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
+import { EditClientRequest } from '@/api/request/client';
+import { getClientById, updateClientById } from '@/api/client';
 
-type EditEmployeeParams = {
+type EditClientParams = {
   id: string;
 };
-export default function EditEmployeePage() {
-  const params = useParams<EditEmployeeParams>();
+export default function EditClientPage() {
+  const params = useParams<EditClientParams>();
   const { dispatch } = useBreadcrumb();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -37,8 +37,8 @@ export default function EditEmployeePage() {
     error,
     isSuccess,
   } = useQuery({
-    queryKey: ['employee', params.id],
-    queryFn: async () => (await getEmployeeById(client, params.id)).data,
+    queryKey: ['client', params.id],
+    queryFn: async () => (await getClientById(client, params.id)).data,
   });
 
   useEffect(() => {
@@ -46,23 +46,23 @@ export default function EditEmployeePage() {
       type: 'SET_BREADCRUMB',
       items: [
         { title: 'Home', url: '/' },
-        { title: 'Employees', url: '/e/employee' },
+        { title: 'Clients', url: '/e/client' },
         { title: 'Edit' },
       ],
     });
   }, [dispatch]);
 
   const { isPending: isPendingUpdate, mutate: doUpdate } = useMutation({
-    mutationKey: ['employee', params.id],
-    mutationFn: async (data: EditEmployeeRequest) =>
-      updateEmployeeById(client, params.id, data),
+    mutationKey: ['client', params.id],
+    mutationFn: async (data: EditClientRequest) =>
+      updateClientById(client, params.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['employee'],
+        queryKey: ['client'],
         exact: false,
       });
-      toast('Employee updated successfully');
-      router.push('/e/employee');
+      toast('Client updated successfully');
+      router.push('/e/client');
     },
     onError: (error) => toastRequestError(error),
   });
@@ -75,22 +75,18 @@ export default function EditEmployeePage() {
     return;
   }
 
-  const employee: EmployeeFormValues = {
+  const clientForEdit: ClientFormValues = {
     firstName: data.firstName,
     lastName: data.lastName,
     dateOfBirth: new Date(data.dateOfBirth),
     email: data.email,
-    address: data.address,
     phoneNumber: data.phone,
-    position: data.position,
-    username: data.username,
-    department: data.department,
+    address: data.address,
     gender: data.gender,
-    active: data.active,
     privilege: data.privileges,
   };
 
-  function onSubmit(data: EmployeeFormAction) {
+  function onSubmit(data: ClientFormAction) {
     if (data.update) {
       doUpdate({
         ...data.data,
@@ -104,17 +100,15 @@ export default function EditEmployeePage() {
       <div className="flex justify-center items-center pt-16">
         <Card className="w-[800px]">
           <CardHeader>
-            <CardTitle>Edit Employee Details</CardTitle>
-            <CardDescription>
-              Update the employee’s information and manage their account status.
-            </CardDescription>
+            <CardTitle>Edit Client Details</CardTitle>
+            <CardDescription>Update the client’s information.</CardDescription>
           </CardHeader>
           <CardContent>
-            <EmployeeForm
+            <ClientForm
               isUpdate={true}
               isPending={isPendingFetch || isPendingUpdate}
-              onSubmit={onSubmit}
-              defaultValues={employee}
+              onSubmitAction={onSubmit}
+              defaultValues={clientForEdit}
             />
           </CardContent>
         </Card>

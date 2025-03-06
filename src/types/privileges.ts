@@ -1,7 +1,7 @@
 /* Please keep in sync with:
  * user-service/src/main/java/rs/banka4/user_service/models/Privilege.java
  */
-const ALL_PRIVILEGES_ = [
+export const ALL_PRIVILEGES_ = [
   'ADMIN',
   'FILTER',
   'SEARCH',

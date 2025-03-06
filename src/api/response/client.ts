@@ -1,3 +1,4 @@
+import { Gender } from '@/types/gender';
 import { Privilege } from '@/types/privileges';
 
 export interface ClientResponseDto {
@@ -5,7 +6,7 @@ export interface ClientResponseDto {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  gender: string;
+  gender: Gender;
   email: string;
   phone: string;
   address: string;
