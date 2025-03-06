@@ -67,6 +67,14 @@ const ClientGroups: SidebarGroupType[] = [
 
 const EmployeeGroups: SidebarGroupType[] = [
   {
+    title: 'Home',
+    url: '/e',
+    icon: Home,
+    isActive: false,
+    userType: 'employee',
+    items: undefined,
+  },
+  {
     title: 'Accounts',
     url: '/e/accounts',
     icon: Coins,

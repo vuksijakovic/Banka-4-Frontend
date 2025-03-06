@@ -10,12 +10,12 @@ import {
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { useQuery } from '@tanstack/react-query';
-import { searchAccounts } from '@/api/accountss';
 import { DataTable } from '@/components/dataTable/DataTable';
 import { accountsColumns } from '@/ui/dataTables/accounts/accounts-columns';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import FilterBar from '@/components/filters/FilterBar';
 import GuardBlock from '@/components/GuardBlock';
+import { searchAccounts } from '@/api/account';
 
 interface AccountFilter {
   accountNumber: string;

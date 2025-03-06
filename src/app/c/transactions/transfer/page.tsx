@@ -14,7 +14,7 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { getAccounts } from '@/api/account';
+import { getClientAccounts } from '@/api/account';
 import { toastRequestError } from '@/api/errors';
 import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
@@ -45,7 +45,7 @@ export default function TransferPage() {
     error,
   } = useQuery<AccountDto[]>({
     queryKey: ['accounts'],
-    queryFn: async () => (await getAccounts(client)).data,
+    queryFn: async () => (await getClientAccounts(client)).data,
   });
 
   const [isTransferSuccessful, setIsTransferSuccessful] = useState(false);

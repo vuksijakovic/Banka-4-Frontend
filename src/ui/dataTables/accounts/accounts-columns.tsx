@@ -32,9 +32,6 @@ export const accountsColumns: ColumnDef<AccountDto>[] = [
     header: 'Actions',
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <Button variant="outline" onClick={() => handleEdit(row.original)}>
-          <AlignJustify />
-        </Button>
         <AccountInfoDialog
           item={{
             accountNumber: row.original.accountNumber,
@@ -49,12 +46,12 @@ export const accountsColumns: ColumnDef<AccountDto>[] = [
             reservedBalance: 0 /* TODO: this is 0 for now. Should be changed in the later sprints */,
           }}
         />
+        <Link href={`/c/transactions?an=${row.original.accountNumber}`}>
+          <Button variant="ghost">
+            <AlignJustify />
+          </Button>
+        </Link>
       </div>
     ),
   },
 ];
-
-const handleEdit = (account: AccountDto) => {
-  <Link href={`#`}></Link>;
-  console.log('See transaction:', account);
-};

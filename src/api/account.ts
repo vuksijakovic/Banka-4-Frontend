@@ -20,7 +20,7 @@ export const searchAccounts = async (
     params: { ...filters, size: rowsPerPage, page: currentPage },
   });
 
-export const getAccounts = async (client: Axios) => {
+export const getClientAccounts = async (client: Axios) => {
   return client.get<AccountDto[]>(`/account/`);
 };
 

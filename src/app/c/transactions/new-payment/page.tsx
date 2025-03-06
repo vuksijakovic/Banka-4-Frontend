@@ -13,7 +13,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Dialog2FA } from '@/components/Dialog2FA';
-import { getAccounts } from '@/api/account';
+import { getClientAccounts } from '@/api/account';
 import { createPayment, sendCode } from '@/api/client';
 import { RecipientDto } from '@/api/response/recipient';
 import { toast } from 'sonner';
@@ -45,7 +45,7 @@ export default function NewPaymentPage() {
 
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
-    queryFn: async () => (await getAccounts(client)).data,
+    queryFn: async () => (await getClientAccounts(client)).data,
   });
 
   const handleCreatePayment = async (data: NewTransactionFormValues) => {

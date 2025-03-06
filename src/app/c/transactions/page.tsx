@@ -1,6 +1,6 @@
 'use client';
 import { TransactionDto } from '@/api/response/transaction';
-import { TransactionFilters, searchTransactions } from '@/api/transaction';
+import { searchTransactions, TransactionFilters } from '@/api/transaction';
 import { DataTable } from '@/components/dataTable/DataTable';
 import FilterBar from '@/components/filters/FilterBar';
 import GuardBlock from '@/components/GuardBlock';
@@ -17,8 +17,10 @@ import useTablePageParams from '@/hooks/useTablePageParams';
 import { transactionColumns } from '@/ui/dataTables/transactions/transactionColumns';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function TransactionsPage() {
+  const params = useSearchParams();
   const { page, pageSize, setPage, setPageSize } = useTablePageParams(
     'transactions',
     { pageSize: 8, page: 0 }
@@ -32,6 +34,7 @@ export default function TransactionsPage() {
     date: undefined,
     status: undefined,
     amount: undefined,
+    accountNumber: params.get('an') ?? '',
   });
 
   const { dispatch } = useBreadcrumb();
@@ -75,7 +78,7 @@ export default function TransactionsPage() {
   };
 
   return (
-    <GuardBlock requiredUserType={'client'}>
+    <GuardBlock>
       <div className="p-8">
         <style>{'th, td {white-space: nowrap;}'}</style>
         <TransactionDialog

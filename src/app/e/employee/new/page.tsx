@@ -72,7 +72,7 @@ export default function NewEmployeePage() {
 
   return (
     <GuardBlock requiredUserType={'employee'} requiredPrivileges={['ADMIN']}>
-      <div className="flex justify-center items-center pt-16">
+      <div className="flex justify-center items-center py-12">
         <Card className="w-[800px]">
           <CardHeader>
             <CardTitle>Add New Employee</CardTitle>

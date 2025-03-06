@@ -2,7 +2,6 @@
 
 import { TransactionsResponseDto } from '@/api/response/transaction';
 import { AccountDto } from '@/api/response/account';
-import { fetchAccounts } from '@/api/accounts';
 import React, { useEffect, useState } from 'react';
 import { AccountCarousel } from '@/components/account/account-carousel';
 import { DataTable } from '@/components/dataTable/DataTable';
@@ -20,6 +19,7 @@ import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { searchTransactions } from '@/api/transaction';
 import useTablePageParams from '@/hooks/useTablePageParams';
+import { getClientAccounts } from '@/api/account';
 
 const ClientHomePage: React.FC = () => {
   const { dispatch } = useBreadcrumb();
@@ -42,7 +42,7 @@ const ClientHomePage: React.FC = () => {
   const { data: accounts } = useQuery<AccountDto[]>({
     queryKey: ['accounts'],
     queryFn: async () => {
-      const response = await fetchAccounts(client);
+      const response = await getClientAccounts(client);
       return response.data;
     },
   });
