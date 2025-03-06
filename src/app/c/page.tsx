@@ -1,8 +1,7 @@
 'use client';
 
-import { TransactionDto } from '@/api/response/transaction';
+import { TransactionsResponseDto } from '@/api/response/transaction';
 import { AccountDto } from '@/api/response/account';
-import { fetchTransactions } from '@/api/transactions';
 import { fetchAccounts } from '@/api/accounts';
 import React, { useEffect, useState } from 'react';
 import { AccountCarousel } from '@/components/account/account-carousel';
@@ -19,6 +18,8 @@ import {
 import { transactionColumns } from '@/ui/dataTables/transactions/transactionColumns';
 import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
+import { searchTransactions } from '@/api/transaction';
+import useTablePageParams from '@/hooks/useTablePageParams';
 
 const ClientHomePage: React.FC = () => {
   const { dispatch } = useBreadcrumb();
@@ -33,6 +34,10 @@ const ClientHomePage: React.FC = () => {
     null
   );
   const client = useHttpClient();
+  const { page, pageSize, setPage, setPageSize } = useTablePageParams(
+    'transactions',
+    { pageSize: 8, page: 0 }
+  );
 
   const { data: accounts } = useQuery<AccountDto[]>({
     queryKey: ['accounts'],
@@ -42,10 +47,18 @@ const ClientHomePage: React.FC = () => {
     },
   });
 
-  const { data: transactions } = useQuery<TransactionDto[]>({
-    queryKey: ['transactions', selectedAccount?.accountNumber],
-    queryFn: async () =>
-      await fetchTransactions(client, selectedAccount?.accountNumber),
+  const { data: transactions, isLoading } = useQuery<TransactionsResponseDto>({
+    queryKey: ['transactions', page, pageSize, selectedAccount?.accountNumber],
+    queryFn: async () => {
+      return (
+        await searchTransactions(
+          client,
+          { accountNumber: selectedAccount?.accountNumber },
+          page,
+          pageSize
+        )
+      ).data;
+    },
     enabled: !!selectedAccount,
   });
 
@@ -92,11 +105,11 @@ const ClientHomePage: React.FC = () => {
             <CardContent>
               <DataTable
                 columns={transactionColumns}
-                data={transactions || []}
-                isLoading={!transactions}
-                pagination={{ page: 0, pageSize: 8 }}
+                data={transactions?.content ?? []}
+                isLoading={isLoading}
+                pagination={{ page, pageSize }}
                 onPaginationChange={() => {}}
-                pageCount={Math.ceil((transactions?.length || 0) / 8)}
+                pageCount={transactions?.page.totalPages ?? 0}
               />
             </CardContent>
           </Card>

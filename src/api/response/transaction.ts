@@ -1,12 +1,12 @@
 import { Pageable } from '@/types/pageable';
 
-export const paymentStatusToString = (status: PaymentStatus): string => {
+export const paymentStatusToString = (status: TransactionStatus): string => {
   switch (status) {
-    case PaymentStatus.REALIZED:
+    case TransactionStatus.REALIZED:
       return 'Realized';
-    case PaymentStatus.REJECTED:
+    case TransactionStatus.REJECTED:
       return 'Rejected';
-    case PaymentStatus.IN_PROGRESS:
+    case TransactionStatus.IN_PROGRESS:
       return 'In Progress';
   }
 };
@@ -27,10 +27,10 @@ export interface TransactionDto {
   referenceNumber: string;
   paymentPurpose?: string;
   paymentDateTime: string;
-  status: PaymentStatus;
+  status: TransactionStatus;
 }
 
-export enum PaymentStatus {
+export enum TransactionStatus {
   REALIZED = 'REALIZED',
   REJECTED = 'REJECTED',
   IN_PROGRESS = 'IN_PROGRESS',

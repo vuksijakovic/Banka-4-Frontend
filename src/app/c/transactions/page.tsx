@@ -1,6 +1,6 @@
 'use client';
 import { TransactionDto } from '@/api/response/transaction';
-import { PaymentFilters, searchPayments } from '@/api/transaction';
+import { TransactionFilters, searchTransactions } from '@/api/transaction';
 import { DataTable } from '@/components/dataTable/DataTable';
 import FilterBar from '@/components/filters/FilterBar';
 import GuardBlock from '@/components/GuardBlock';
@@ -28,7 +28,7 @@ export default function TransactionsPage() {
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransactionDto>();
 
-  const [paymentFilters, setPaymentFilters] = useState<PaymentFilters>({
+  const [paymentFilters, setPaymentFilters] = useState<TransactionFilters>({
     date: undefined,
     status: undefined,
     amount: undefined,
@@ -49,7 +49,7 @@ export default function TransactionsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['payment', page, pageSize],
     queryFn: async () => {
-      const response = await searchPayments(
+      const response = await searchTransactions(
         client,
         paymentFilters,
         page,
@@ -59,7 +59,9 @@ export default function TransactionsPage() {
     },
   });
 
-  const transactionFilterKeyToName = (key: keyof PaymentFilters): string => {
+  const transactionFilterKeyToName = (
+    key: keyof TransactionFilters
+  ): string => {
     switch (key) {
       case 'amount':
         return 'Amount';
@@ -67,6 +69,8 @@ export default function TransactionsPage() {
         return 'Date';
       case 'status':
         return 'Status';
+      case 'accountNumber':
+        return 'account number';
     }
   };
 
@@ -87,7 +91,7 @@ export default function TransactionsPage() {
               transaction details for quick reference and easy access.
             </CardDescription>
             {/* TODO: date, enum and number filters */}
-            <FilterBar<PaymentFilters>
+            <FilterBar<TransactionFilters>
               filterKeyToName={transactionFilterKeyToName}
               onSearch={(filter) => {
                 setPage(0);
