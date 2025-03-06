@@ -7,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -22,12 +21,14 @@ import { useTheme } from 'next-themes';
 export function FooterSidebar({
   user,
   onLogoutAction,
+  onProfileAction,
 }: {
   user: {
     name: string;
     email: string;
     avatar: string;
   };
+  onProfileAction: () => void;
   onLogoutAction: () => void;
 }) {
   const { isMobile } = useSidebar();
@@ -58,7 +59,10 @@ export function FooterSidebar({
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
+            <DropdownMenuItem
+              onClick={onProfileAction}
+              className="p-0 font-normal cursor-pointer"
+            >
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
@@ -69,7 +73,7 @@ export function FooterSidebar({
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
-            </DropdownMenuLabel>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className={'cursor-pointer'}

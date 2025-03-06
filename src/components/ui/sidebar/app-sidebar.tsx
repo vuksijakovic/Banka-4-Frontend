@@ -1,6 +1,6 @@
 'use client';
 
-import { BriefcaseBusiness, Landmark, List, UserPlus } from 'lucide-react';
+import { Landmark } from 'lucide-react';
 
 import {
   Sidebar,
@@ -15,11 +15,27 @@ import { HeaderSidebar } from './header-sidebar';
 import { FooterSidebar } from './footer-sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { useMe } from '@/hooks/use-me';
-import { Privilege, isValidPrivilege } from '@/types/privileges';
+import { isValidPrivilege, Privilege } from '@/types/privileges';
+import { SidebarData } from '@/types/sidebar';
+import { ALL_GROUPS } from '@/ui/sidebar/entries';
+import { filterSidebarItemsByPrivileges } from '@/lib/sidebar-utils';
+import { useRouter } from 'next/navigation';
+
+const data: SidebarData = {
+  teams: [
+    {
+      name: 'RAFeisen Bank',
+      logo: Landmark,
+      url: '/',
+    },
+  ],
+  navMain: ALL_GROUPS,
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const auth = useAuth();
   const me = useMe();
+  const router = useRouter();
 
   const onLogout = () => {
     if (auth.isLoggedIn) {
@@ -27,54 +43,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   };
 
+  const onProfileClick = () => {
+    if (me.state === 'logged-in' && me.type === 'client') {
+      router.push('/c/profile');
+    }
+  };
+
   const userPrivileges: Privilege[] =
     me.state === 'logged-in' ? me.me.privileges.filter(isValidPrivilege) : [];
 
-  const hasRequiredPrivileges = (requiredPrivileges: Privilege[]) => {
-    return requiredPrivileges.every((priv) => userPrivileges.includes(priv));
-  };
-
-  const data = {
-    teams: [
-      {
-        name: 'RAFeisen Bank',
-        logo: Landmark,
-        url: '/',
-      },
-    ],
-    navMain: [
-      {
-        title: 'Employees',
-        url: '/employee',
-        icon: BriefcaseBusiness,
-        isActive: true,
-        items: [
-          {
-            title: 'Overview',
-            url: '/employee',
-            icon: List,
-            privileges: ['ADMIN', 'SEARCH', 'FILTER'],
-          },
-          {
-            title: 'New',
-            url: '/employee/new',
-            icon: UserPlus,
-            privileges: ['ADMIN', 'CREATE'],
-          },
-        ],
-      },
-    ]
-      .map((section) => {
-        const filteredItems = section.items.filter((item) =>
-          hasRequiredPrivileges(item.privileges as Privilege[])
-        );
-
-        return filteredItems.length > 0
-          ? { ...section, items: filteredItems }
-          : null;
-      })
-      .filter((item): item is NonNullable<typeof item> => item !== null),
-  };
+  const userType = me.state === 'logged-in' ? me.type : undefined;
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -82,11 +60,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <HeaderSidebar teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain
+          items={filterSidebarItemsByPrivileges(
+            data.navMain.filter(
+              (g) => userType !== undefined && userType === g.userType
+            ),
+            userPrivileges
+          )}
+        />
       </SidebarContent>
       {me.state === 'logged-in' && (
         <SidebarFooter>
           <FooterSidebar
+            onProfileAction={onProfileClick}
             onLogoutAction={onLogout}
             user={{
               name: me.me.firstName,
@@ -100,3 +86,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+
+// items={filterSidebarItemsByPrivileges(
+//       data.navMain.filter(
+//       (g) => userType !== undefined && userType === g.userType
+//   ),
+//   userPrivileges
+// )}
