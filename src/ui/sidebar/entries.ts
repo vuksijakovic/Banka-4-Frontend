@@ -104,20 +104,20 @@ const EmployeeGroups: SidebarGroupType[] = [
   },
   {
     title: 'Employees',
-    url: '/employee',
+    url: '/e/employee',
     icon: BriefcaseBusiness,
     isActive: false,
     userType: 'employee',
     items: [
       {
         title: 'Overview',
-        url: '/employee',
+        url: '/e/employee',
         icon: List,
         privileges: ['ADMIN'],
       },
       {
         title: 'New',
-        url: '/employee/new',
+        url: '/e/employee/new',
         icon: UserPlus,
         privileges: ['ADMIN'],
       },
