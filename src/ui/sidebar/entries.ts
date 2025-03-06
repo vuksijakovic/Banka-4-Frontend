@@ -36,13 +36,13 @@ const ClientGroups: SidebarGroupType[] = [
       },
       {
         title: 'New Payment',
-        url: '/c/new-payment',
+        url: '/c/transactions/new-payment',
         icon: Nfc,
         privileges: [],
       },
       {
         title: 'New Transfer',
-        url: '/c/transfer',
+        url: '/c/transactions/transfer',
         icon: HandCoins,
         privileges: [],
       },
