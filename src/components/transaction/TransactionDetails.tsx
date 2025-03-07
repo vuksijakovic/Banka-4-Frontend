@@ -52,11 +52,6 @@ export default function TransactionDetails({
       })}
       {fieldFormatter({
         name: 'From account number',
-        children: <></>,
-        isFirst: false,
-      })}
-      {fieldFormatter({
-        name: 'From account number',
         children: <p>{dto.fromAccount}</p>,
         isFirst: false,
       })}
