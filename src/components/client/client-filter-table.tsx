@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FilterBar from '@/components/filters/FilterBar';
+import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
 import { DataTable } from '@/components/dataTable/DataTable';
 import { ClientResponseDto } from '@/api/response/client';
 import { clientsColumns } from '@/ui/dataTables/client/clientColumns';
@@ -15,17 +15,23 @@ export interface ClientFilter {
   phone: string;
 }
 
-const clientFilterKeyToName = (key: keyof ClientFilter): string => {
-  switch (key) {
-    case 'firstName':
-      return 'First Name';
-    case 'lastName':
-      return 'Last Name';
-    case 'email':
-      return 'Email';
-    case 'phone':
-      return 'Phone Number';
-  }
+const clientFilterColumns: Record<keyof ClientFilter, FilterDefinition> = {
+  firstName: {
+    filterType: 'string',
+    placeholder: 'Enter first name',
+  },
+  lastName: {
+    filterType: 'string',
+    placeholder: 'Enter last name',
+  },
+  email: {
+    filterType: 'string',
+    placeholder: 'Enter email',
+  },
+  phone: {
+    filterType: 'string',
+    placeholder: 'Enter phone number',
+  },
 };
 
 interface ClientFilterTableProps {
@@ -67,13 +73,13 @@ export default function ClientFilterTable(props: ClientFilterTableProps) {
 
   return (
     <>
-      <FilterBar<ClientFilter>
-        filterKeyToName={clientFilterKeyToName}
-        onSearch={(filter) => {
+      <FilterBar<ClientFilter, typeof clientFilterColumns>
+        onSubmit={(filter) => {
           setPage(0);
           setSearchFilter(filter);
         }}
         filter={searchFilter}
+        columns={clientFilterColumns}
       />
       <DataTable<ClientResponseDto>
         onRowClick={(row) => props.onRowClick(row.original)}
@@ -81,7 +87,7 @@ export default function ClientFilterTable(props: ClientFilterTableProps) {
         data={data?.content ?? []}
         isLoading={isLoading}
         pageCount={data?.page.totalPages ?? 0}
-        pagination={{ page: page, pageSize }}
+        pagination={{ page, pageSize }}
         onPaginationChange={(newPagination) => {
           setPage(newPagination.page);
           setPageSize(newPagination.pageSize);

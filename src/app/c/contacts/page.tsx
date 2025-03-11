@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import {
   Card,
@@ -10,7 +9,7 @@ import {
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import FilterBar from '@/components/filters/FilterBar';
+import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import {
@@ -31,13 +30,15 @@ interface ContactFilter {
   accountNumber: string;
 }
 
-const contactFilterKeyToName = (key: keyof ContactFilter): string => {
-  switch (key) {
-    case 'name':
-      return 'Name';
-    case 'accountNumber':
-      return 'Account Number';
-  }
+const contactFilterColumns: Record<keyof ContactFilter, FilterDefinition> = {
+  name: {
+    filterType: 'string',
+    placeholder: 'Enter name',
+  },
+  accountNumber: {
+    filterType: 'string',
+    placeholder: 'Enter account number',
+  },
 };
 
 const ContactsPage: React.FC = () => {
@@ -86,19 +87,19 @@ const ContactsPage: React.FC = () => {
 
   const pageCount = data?.page.totalPages ?? 0;
 
-  // Callback za edit
+  // Callback for editing a contact
   const handleEdit = (contact: ContactResponseDto) => {
     setSelectedContact(contact);
     setShowClientForm(true);
   };
 
-  // Callback za delete
+  // Callback for deleting a contact
   const handleDelete = (contact: ContactResponseDto) => {
     setSelectedContact(contact);
     setShowDeleteDialog(true);
   };
 
-  // Callback koji dobija akciju iz forme
+  // Callback receiving action from the contact form
   const handleContactSubmit = (action: ContactFormAction) => {
     if (action.update) {
       console.log('Update contact with data:', action.data);
@@ -140,13 +141,13 @@ const ContactsPage: React.FC = () => {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <FilterBar<ContactFilter>
-              filterKeyToName={contactFilterKeyToName}
-              onSearch={(filter) => {
+            <FilterBar<ContactFilter, typeof contactFilterColumns>
+              onSubmit={(filter) => {
                 setPage(0);
                 setSearchFilter(filter);
               }}
               filter={searchFilter}
+              columns={contactFilterColumns}
             />
           </CardHeader>
           <CardContent className="rounded-lg overflow-hidden">

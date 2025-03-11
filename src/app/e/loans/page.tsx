@@ -13,7 +13,7 @@ import GuardBlock from '@/components/GuardBlock';
 import { useQuery } from '@tanstack/react-query';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
-import FilterBar from '@/components/filters/FilterBar';
+import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
 import { searchAllLoans } from '@/api/loans';
 import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
 
@@ -23,15 +23,19 @@ interface LoanFilter {
   status: string;
 }
 
-const loanFilterKeyToName = (key: keyof LoanFilter): string => {
-  switch (key) {
-    case 'type':
-      return 'type';
-    case 'loanNumber':
-      return 'loan number';
-    case 'status':
-      return 'status';
-  }
+const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
+  type: {
+    filterType: 'string',
+    placeholder: 'Enter loan type',
+  },
+  loanNumber: {
+    filterType: 'string',
+    placeholder: 'Enter loan number',
+  },
+  status: {
+    filterType: 'string',
+    placeholder: 'Enter status',
+  },
 };
 
 const LoansOverviewPage: React.FC = () => {
@@ -40,7 +44,6 @@ const LoansOverviewPage: React.FC = () => {
     page: 0,
   });
 
-  //TODO implement enum filters
   const [searchFilter, setSearchFilter] = useState<LoanFilter>({
     type: '',
     loanNumber: '',
@@ -68,7 +71,7 @@ const LoansOverviewPage: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <GuardBlock requiredUserType={'employee'}>
+    <GuardBlock requiredUserType="employee">
       <div className="p-8">
         <Card className="max-w-[900px] mx-auto">
           <CardHeader>
@@ -78,13 +81,13 @@ const LoansOverviewPage: React.FC = () => {
               making it easy to review key details and track relevant
               information.
             </CardDescription>
-            <FilterBar<LoanFilter>
-              filterKeyToName={loanFilterKeyToName}
-              onSearch={(filter) => {
+            <FilterBar<LoanFilter, typeof loanFilterColumns>
+              onSubmit={(filter) => {
                 setPage(0);
                 setSearchFilter(filter);
               }}
               filter={searchFilter}
+              columns={loanFilterColumns}
             />
           </CardHeader>
           <CardContent className="rounded-lg overflow-hidden">
@@ -93,7 +96,7 @@ const LoansOverviewPage: React.FC = () => {
               data={data?.content ?? []}
               isLoading={isLoading}
               pageCount={data?.page.totalPages ?? 0}
-              pagination={{ page: page, pageSize }}
+              pagination={{ page, pageSize }}
               onPaginationChange={(newPagination) => {
                 setPage(newPagination.page);
                 setPageSize(newPagination.pageSize);
