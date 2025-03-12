@@ -55,7 +55,7 @@ const LoansOverviewPage: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['loans', page, pageSize, searchFilter],
     queryFn: async () =>
-      (await searchAllLoans(client, searchFilter,  page, pageSize)).data,
+      (await searchAllLoans(client, searchFilter, page, pageSize)).data,
   });
 
   const { dispatch } = useBreadcrumb();

@@ -45,10 +45,13 @@ const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
 };
 
 const LoansRequestsPage: React.FC = () => {
-  const { page, pageSize, setPage, setPageSize } = useTablePageParams('loan-requests', {
-    pageSize: 8,
-    page: 0,
-  });
+  const { page, pageSize, setPage, setPageSize } = useTablePageParams(
+    'loan-requests',
+    {
+      pageSize: 8,
+      page: 0,
+    }
+  );
 
   const [searchFilter, setSearchFilter] = useState<LoanFilter>({
     loanType: '',
@@ -61,20 +64,27 @@ const LoansRequestsPage: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['loan-requests', page, pageSize, searchFilter],
     queryFn: async () =>
-      (await searchAllLoans(client, { ...searchFilter, loanStatus: 'PROCESSING' }, page, pageSize)).data,
+      (
+        await searchAllLoans(
+          client,
+          { ...searchFilter, loanStatus: 'PROCESSING' },
+          page,
+          pageSize
+        )
+      ).data,
   });
 
   const approveMutation = useMutation({
     mutationFn: (loanNumber: number) => approveLoan(client, loanNumber),
     onSuccess: () => {
-      queryClient.invalidateQueries(['loan-requests']);
+      queryClient.invalidateQueries({ queryKey: ['loan-requests'] });
     },
   });
 
   const rejectMutation = useMutation({
     mutationFn: (loanNumber: number) => rejectLoan(client, loanNumber),
     onSuccess: () => {
-      queryClient.invalidateQueries(['loan-requests']);
+      queryClient.invalidateQueries({ queryKey: ['loan-requests'] });
     },
   });
 
@@ -108,7 +118,11 @@ const LoansRequestsPage: React.FC = () => {
               <p>Are you sure you want to approve this loan?</p>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => approveMutation.mutate(row.original.loanNumber)}>
+                <AlertDialogAction
+                  onClick={() =>
+                    approveMutation.mutate(row.original.loanNumber)
+                  }
+                >
                   Confirm
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -125,7 +139,9 @@ const LoansRequestsPage: React.FC = () => {
               <p>Are you sure you want to deny this loan?</p>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => rejectMutation.mutate(row.original.loanNumber)}>
+                <AlertDialogAction
+                  onClick={() => rejectMutation.mutate(row.original.loanNumber)}
+                >
                   Confirm
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -143,7 +159,8 @@ const LoansRequestsPage: React.FC = () => {
           <CardHeader>
             <h1 className="text-2xl font-bold">Loan Requests</h1>
             <CardDescription>
-              Review and manage loan requests that are currently in processing status.
+              Review and manage loan requests that are currently in processing
+              status.
             </CardDescription>
             <FilterBar<LoanFilter, typeof loanFilterColumns>
               onSubmit={(filter) => {
