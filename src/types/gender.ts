@@ -1,3 +1,3 @@
-export type Gender = 'Male' | 'Female';
+export const ALL_GENDERS_ = ['MALE', 'FEMALE'] as const;
 
-export const genderValues = ['Male', 'Female'] as const;
+export type Gender = (typeof ALL_GENDERS_)[number];

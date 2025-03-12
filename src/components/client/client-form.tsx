@@ -29,7 +29,7 @@ import { SomePartial } from '@/types/utils';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { getDirtyValues } from '@/lib/form-utils';
 import { ALL_PRIVILEGES, ALL_PRIVILEGES_ } from '@/types/privileges';
-import { genderValues } from '@/types/gender';
+import { ALL_GENDERS_ } from '@/types/gender';
 
 const formSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -40,7 +40,7 @@ const formSchema = z.object({
     .string()
     .regex(/^(\+3816|06)(\d{7,8}|(77|78)\d{5,6})$/, 'Invalid phone number'),
   address: z.string().min(1, 'Address is required'),
-  gender: z.enum(genderValues, { required_error: 'Gender is required' }),
+  gender: z.enum(ALL_GENDERS_, { required_error: 'Gender is required' }),
   privilege: z.union([z.tuple([]), z.array(z.enum(ALL_PRIVILEGES_))]),
 });
 
@@ -237,11 +237,11 @@ export default function ClientForm({
                   className="flex space-x-4 pt-3"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Male" id="r1" />
+                    <RadioGroupItem value="MALE" id="r1" />
                     <Label htmlFor="r1">Male</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Female" id="r2" />
+                    <RadioGroupItem value="FEMALE" id="r2" />
                     <Label htmlFor="r2">Female</Label>
                   </div>
                 </RadioGroup>
