@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
   Card,
@@ -9,37 +10,25 @@ import {
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
 import { DataTable } from '@/components/dataTable/DataTable';
+import { ClientContactDto } from '@/api/response/contact';
 import useTablePageParams from '@/hooks/useTablePageParams';
-import {
-  ContactResponseDto,
-  createContactsColumns,
-} from '@/ui/dataTables/contacts/contactsColumns';
-import ContactForm, {
+import { createContactsColumns } from '@/ui/dataTables/contacts/contactsColumns';
+import ContactFormDialog, {
   ContactFormAction,
-} from '@/components/contacts/contact-form';
+} from '@/components/contacts/contact-form-dialog';
 import { DeleteDialog } from '@/components/DeleteDialog';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useHttpClient } from '@/context/HttpClientContext';
-import { searchContacts } from '@/api/contact';
+import {
+  deleteContact,
+  postNewContact,
+  searchContacts,
+  updateContact,
+} from '@/api/contact';
 import GuardBlock from '@/components/GuardBlock';
-
-interface ContactFilter {
-  name: string;
-  accountNumber: string;
-}
-
-const contactFilterColumns: Record<keyof ContactFilter, FilterDefinition> = {
-  name: {
-    filterType: 'string',
-    placeholder: 'Enter name',
-  },
-  accountNumber: {
-    filterType: 'string',
-    placeholder: 'Enter account number',
-  },
-};
+import { toastRequestError } from '@/api/errors';
+import { EditContactRequest } from '@/api/request/contact';
 
 const ContactsPage: React.FC = () => {
   const { page, pageSize, setPage, setPageSize } = useTablePageParams(
@@ -49,13 +38,10 @@ const ContactsPage: React.FC = () => {
       page: 0,
     }
   );
-  const [searchFilter, setSearchFilter] = useState<ContactFilter>({
-    name: '',
-    accountNumber: '',
-  });
+
   const [showClientForm, setShowClientForm] = useState(false);
   const [selectedContact, setSelectedContact] =
-    useState<ContactResponseDto | null>(null);
+    useState<ClientContactDto | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { dispatch } = useBreadcrumb();
@@ -71,15 +57,12 @@ const ContactsPage: React.FC = () => {
   }, [dispatch]);
 
   const client = useHttpClient();
+  const queryClient = useQueryClient();
+
   const { data, isLoading } = useQuery({
-    queryKey: ['contact', page, pageSize, searchFilter],
+    queryKey: ['contact', page, pageSize],
     queryFn: async () => {
-      const response = await searchContacts(
-        client,
-        searchFilter,
-        pageSize,
-        page
-      );
+      const response = await searchContacts(client, pageSize, page);
       return response.data;
     },
     staleTime: 5000,
@@ -87,29 +70,80 @@ const ContactsPage: React.FC = () => {
 
   const pageCount = data?.page.totalPages ?? 0;
 
-  // Callback for editing a contact
-  const handleEdit = (contact: ContactResponseDto) => {
+  const handleEdit = (contact: ClientContactDto) => {
     setSelectedContact(contact);
     setShowClientForm(true);
   };
 
-  // Callback for deleting a contact
-  const handleDelete = (contact: ContactResponseDto) => {
+  const handleDelete = (contact: ClientContactDto) => {
     setSelectedContact(contact);
     setShowDeleteDialog(true);
   };
 
-  // Callback receiving action from the contact form
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => await deleteContact(client, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contact'] });
+    },
+    onError: (error) => {
+      toastRequestError(error);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: { id: string; updateData: EditContactRequest }) =>
+      await updateContact(client, data.id, data.updateData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contact'] });
+    },
+    onError: (error) => {
+      toastRequestError(error);
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: { nickname: string; accountNumber: string }) =>
+      await postNewContact(client, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contact'] });
+    },
+    onError: (error) => {
+      toastRequestError(error);
+    },
+  });
+
+  const handleDeleteConfirm = () => {
+    if (!selectedContact) return;
+    deleteMutation.mutate(selectedContact.id, {
+      onSettled: () => {
+        setShowDeleteDialog(false);
+        setSelectedContact(null);
+      },
+    });
+  };
+
   const handleContactSubmit = (action: ContactFormAction) => {
     if (action.update) {
-      console.log('Update contact with data:', action.data);
-      // TODO: Call updateContact API method here
+      if (!selectedContact) {
+        throw Error('No contact selected for update');
+      }
+      updateMutation.mutate(
+        { id: selectedContact.id, updateData: action.data },
+        {
+          onSettled: () => {
+            setShowClientForm(false);
+            setSelectedContact(null);
+          },
+        }
+      );
     } else {
-      console.log('Create new contact with data:', action.data);
-      // TODO: Call postNewContact API method here
+      createMutation.mutate(action.data, {
+        onSettled: () => {
+          setShowClientForm(false);
+          setSelectedContact(null);
+        },
+      });
     }
-    setShowClientForm(false);
-    setSelectedContact(null);
   };
 
   const handleContactCancel = () => {
@@ -141,17 +175,9 @@ const ContactsPage: React.FC = () => {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            <FilterBar<ContactFilter, typeof contactFilterColumns>
-              onSubmit={(filter) => {
-                setPage(0);
-                setSearchFilter(filter);
-              }}
-              filter={searchFilter}
-              columns={contactFilterColumns}
-            />
           </CardHeader>
           <CardContent className="rounded-lg overflow-hidden">
-            <DataTable<ContactResponseDto>
+            <DataTable<ClientContactDto>
               onRowClick={() => {}}
               columns={columns}
               data={data?.content ?? []}
@@ -167,28 +193,30 @@ const ContactsPage: React.FC = () => {
         </Card>
       </div>
 
-      {showClientForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-black rounded-lg p-6 shadow-2xl">
-            <ContactForm
-              contact={selectedContact}
-              onSubmit={handleContactSubmit}
-              onCancel={handleContactCancel}
-            />
-          </div>
-        </div>
-      )}
+      <ContactFormDialog
+        open={showClientForm}
+        onOpenChange={setShowClientForm}
+        contact={
+          selectedContact
+            ? {
+                nickname: selectedContact.nickname,
+                accountNumber: selectedContact.accountNumber,
+              }
+            : null
+        }
+        onSubmit={handleContactSubmit}
+        onCancel={handleContactCancel}
+        isPending={
+          createMutation.status === 'pending' ||
+          updateMutation.status === 'pending'
+        }
+      />
 
       {showDeleteDialog && selectedContact && (
         <DeleteDialog
           open={showDeleteDialog}
-          itemName={selectedContact.fullName}
-          onConfirm={() => {
-            console.log('Deleting contact', selectedContact?.accountNumber);
-            // TODO: Call deleteContact API method here
-            setShowDeleteDialog(false);
-            setSelectedContact(null);
-          }}
+          itemName={selectedContact.nickname}
+          onConfirm={handleDeleteConfirm}
           onCancel={() => {
             setShowDeleteDialog(false);
             setSelectedContact(null);
