@@ -18,21 +18,21 @@ import { searchAllLoans } from '@/api/loans';
 import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
 
 interface LoanFilter {
-  type: string;
-  loanNumber: string;
-  status: string;
+  loanType: string;
+  accountNumber: string;
+  loanStatus: string;
 }
 
 const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
-  type: {
+  loanType: {
     filterType: 'string',
     placeholder: 'Enter loan type',
   },
-  loanNumber: {
+  accountNumber: {
     filterType: 'string',
-    placeholder: 'Enter loan number',
+    placeholder: 'Enter account number',
   },
-  status: {
+  loanStatus: {
     filterType: 'string',
     placeholder: 'Enter status',
   },
@@ -45,9 +45,9 @@ const LoansOverviewPage: React.FC = () => {
   });
 
   const [searchFilter, setSearchFilter] = useState<LoanFilter>({
-    type: '',
-    loanNumber: '',
-    status: '',
+    loanType: '',
+    accountNumber: '',
+    loanStatus: '',
   });
 
   const client = useHttpClient();
@@ -55,7 +55,7 @@ const LoansOverviewPage: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['loans', page, pageSize, searchFilter],
     queryFn: async () =>
-      (await searchAllLoans(client, searchFilter, pageSize, page)).data,
+      (await searchAllLoans(client, searchFilter,  page, pageSize)).data,
   });
 
   const { dispatch } = useBreadcrumb();
