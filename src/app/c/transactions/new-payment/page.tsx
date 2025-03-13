@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useHttpClient } from '@/context/HttpClientContext';
 import NewTransactionForm, {
   NewTransactionFormValues,
@@ -13,13 +13,13 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Dialog2FA } from '@/components/Dialog2FA';
-import { getClientAccounts } from '@/api/account';
-import { createPayment, sendCode } from '@/api/client';
-import { RecipientDto } from '@/api/response/recipient';
-import { toast } from 'sonner';
-import { PaymentResponseDto } from '@/api/response/client';
+import { getAccounts } from '@/api/account';
+import { createPayment, getAllClientContacts } from '@/api/client';
 import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
+import { toast, Toaster } from 'sonner';
+import { NewPaymentRequest } from '@/api/request/transaction';
+import { toastRequestError } from '@/api/errors';
 
 export default function NewPaymentPage() {
   const { dispatch } = useBreadcrumb();
@@ -33,19 +33,37 @@ export default function NewPaymentPage() {
       ],
     });
   }, [dispatch]);
-  const [recipients] = useState<RecipientDto[]>(
-    []
-  ); /* TODO(marko): implement get recipients endpoint (when backend implements it...) */
-  const [isPending, setIsPending] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [paymentData, setPaymentData] =
     useState<NewTransactionFormValues | null>(null);
 
   const client = useHttpClient();
 
-  const { data: accounts } = useQuery({
+  const { data: accounts, isLoading: isLoadingAccounts } = useQuery({
     queryKey: ['accounts'],
-    queryFn: async () => (await getClientAccounts(client)).data,
+    queryFn: async () => {
+      return (await getAccounts(client)).data;
+    },
+  });
+
+  const { data: recipients, isLoading: isLoadingRecipients } = useQuery({
+    queryKey: ['recipients'],
+    queryFn: async () => {
+      /* TODO(marko): replace this with get all clients api that will be implemented. */
+      return (await getAllClientContacts(client, 10, 0)).data;
+    },
+  });
+
+  const { mutate: makePayment, isPending } = useMutation({
+    mutationKey: ['payment'],
+    mutationFn: async (paymentRequest: NewPaymentRequest) =>
+      await createPayment(client, paymentRequest),
+    onError: (error) => toastRequestError(error),
+    onSuccess: () => {
+      setIsDialogOpen(false);
+      setPaymentData(null);
+      toast.success('payment made successfully.');
+    },
   });
 
   const handleCreatePayment = async (data: NewTransactionFormValues) => {
@@ -53,38 +71,22 @@ export default function NewPaymentPage() {
     setIsDialogOpen(true);
   };
 
-  /* TODO(marko): fix this once backend implements 2FA; no point in doing it now since the whole logic will change then */
   const handleDialogSubmit = async (otp: string) => {
-    if (!paymentData) return;
-
-    try {
-      setIsPending(true);
-
-      const paymentRequest = {
-        fromAccount: paymentData.payerAccount,
-        toAccount: paymentData.recipientAccount,
-        recipient: paymentData.recipientName,
-        fromAmount: paymentData.amount,
-        paymentCode: paymentData.paymentCode,
-        paymentPurpose: paymentData.paymentPurpose,
-        referenceNumber: paymentData.referenceNumber ?? '',
-      };
-
-      const response: PaymentResponseDto = await createPayment(
-        client,
-        paymentRequest
-      );
-      const paymentId = response.id;
-      await sendCode(client, { content: otp, paymentId });
-      console.log('Payment successful', response);
-      setIsDialogOpen(false);
-      toast.success('Payment successful');
-    } catch (error) {
-      console.error('Payment failed', error);
-      toast.error('Payment failed');
-    } finally {
-      setIsPending(false);
+    if (!paymentData) {
+      throw Error('invalid state.');
     }
+
+    makePayment({
+      fromAccount: paymentData.payerAccount,
+      toAccount: paymentData.recipientAccount,
+      recipient: paymentData.recipientName,
+      fromAmount: paymentData.amount,
+      paymentCode: paymentData.paymentCode,
+      paymentPurpose: paymentData.paymentPurpose,
+      referenceNumber: paymentData.referenceNumber ?? '',
+      saveRecipient: paymentData.saveRecipient,
+      otpCode: otp,
+    });
   };
 
   return (
@@ -102,9 +104,9 @@ export default function NewPaymentPage() {
           <CardContent className={'pt-6'}>
             <NewTransactionForm
               onSubmitAction={handleCreatePayment}
-              accounts={accounts || []}
-              recipients={recipients}
-              isPending={isPending}
+              accounts={accounts ?? []}
+              recipients={recipients?.content ?? []}
+              isPending={isPending || isLoadingAccounts || isLoadingRecipients}
             />
             <Dialog2FA
               open={isDialogOpen}
@@ -113,6 +115,7 @@ export default function NewPaymentPage() {
             />
           </CardContent>
         </Card>
+        <Toaster />
       </div>
     </GuardBlock>
   );
