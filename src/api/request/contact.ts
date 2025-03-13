@@ -1,6 +1,6 @@
 export interface NewContactRequest {
-  fullName: string;
+  nickname: string;
   accountNumber: string;
 }
 
-export type EditContactRequest = Partial<NewContactRequest>;
+export type EditContactRequest = NewContactRequest;

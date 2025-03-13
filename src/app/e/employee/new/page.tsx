@@ -96,7 +96,7 @@ export default function NewEmployeePage() {
                 position: '',
                 username: '',
                 department: '',
-                gender: 'Male',
+                gender: 'MALE',
                 active: true,
                 privilege: [],
               }}

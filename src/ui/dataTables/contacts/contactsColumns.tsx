@@ -1,17 +1,18 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Edit2, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatAccountNumber } from '@/lib/account-utils';
 
-// Pretpostavljamo da tip za kontakt izgleda ovako:
-export interface ContactResponseDto {
-  fullName: string;
+export interface ClientContactDto {
+  id: string;
+  nickname: string;
   accountNumber: string;
 }
 
 interface ContactsActionsProps {
-  contact: ContactResponseDto;
-  onEdit: (contact: ContactResponseDto) => void;
-  onDelete: (contact: ContactResponseDto) => void;
+  contact: ClientContactDto;
+  onEdit: (contact: ClientContactDto) => void;
+  onDelete: (contact: ClientContactDto) => void;
 }
 
 export const ContactsActions = ({
@@ -21,7 +22,7 @@ export const ContactsActions = ({
 }: ContactsActionsProps) => {
   return (
     <div className="flex justify-end items-center space-x-2">
-      <Button onClick={() => onEdit(contact)}>
+      <Button variant={'outline'} onClick={() => onEdit(contact)}>
         <Edit2 className="h-4 w-4" />
       </Button>
       <Button onClick={() => onDelete(contact)} variant={'destructive'}>
@@ -32,18 +33,18 @@ export const ContactsActions = ({
 };
 
 export const createContactsColumns = (
-  onEdit: (contact: ContactResponseDto) => void,
-  onDelete: (contact: ContactResponseDto) => void
-): ColumnDef<ContactResponseDto>[] => [
+  onEdit: (contact: ClientContactDto) => void,
+  onDelete: (contact: ClientContactDto) => void
+): ColumnDef<ClientContactDto>[] => [
   {
-    accessorKey: 'fullName',
-    header: 'Full Name',
+    accessorKey: 'nickname',
+    header: 'Nickname',
     cell: (info) => info.getValue(),
   },
   {
     accessorKey: 'accountNumber',
     header: 'Account Number',
-    cell: (info) => info.getValue(),
+    cell: (info) => formatAccountNumber(info.getValue() as string),
   },
   {
     id: 'actions',

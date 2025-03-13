@@ -23,6 +23,9 @@ export const searchAccounts = async (
 export const getClientAccounts = async (client: Axios) => {
   return client.get<AccountDto[]>(`/account`);
 };
+export const getAccounts = async (client: Axios) => {
+  return client.get<AccountDto[]>(`/account`);
+};
 
 export const postNewAccount = async (client: Axios, data: NewAccountDto) =>
   client.post<void>('/account', data);

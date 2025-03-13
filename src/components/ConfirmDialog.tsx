@@ -1,39 +1,39 @@
 import { MaybePromise } from '@/types/MaybePromise';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 
-export type DeleteDialogProps = {
+export type ConfirmDialogProps = {
   open: boolean;
   onConfirm: () => MaybePromise<unknown>;
   onCancel?: () => MaybePromise<unknown>;
-  itemName?: string;
+  title: string;
+  description: string;
+  buttonText?: string;
 };
 
-export const DeleteDialog = ({
+export const ConfirmDialog = ({
   open,
   onConfirm,
   onCancel,
-  itemName,
-}: DeleteDialogProps) => {
+  title,
+  description,
+  buttonText = 'Confirm',
+}: ConfirmDialogProps) => {
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete{' '}
-            {itemName ? `"${itemName}"` : 'this item'}? This action cannot be
-            undone.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
@@ -43,7 +43,7 @@ export const DeleteDialog = ({
           </AlertDialogCancel>
           <AlertDialogAction asChild>
             <Button onClick={onConfirm} variant="destructive">
-              Delete
+              {buttonText}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

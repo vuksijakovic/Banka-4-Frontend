@@ -11,6 +11,7 @@ import {
   UserPlus,
   Users,
   CircleDollarSign,
+  WalletCards,
 } from 'lucide-react';
 
 const ClientGroups: SidebarGroupType[] = [
@@ -125,6 +126,21 @@ const EmployeeGroups: SidebarGroupType[] = [
         privileges: [],
       },
     ],
+  },
+  {
+    title: 'Cards',
+    url: '/e/cards',
+    icon: WalletCards,
+    items: [
+      {
+        title: 'Overview',
+        url: '/e/cards',
+        icon: List,
+        privileges: [],
+      },
+    ],
+    isActive: false,
+    userType: 'employee',
   },
   {
     title: 'Employees',

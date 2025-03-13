@@ -22,10 +22,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PAYMENT_CODE_MAP } from '@/lib/payment-utils';
-import { RecipientDto } from '@/api/response/recipient';
 import { AccountDto } from '@/api/response/account';
 import { Switch } from '@/components/ui/switch';
 import { SomePartial } from '@/types/utils';
+import { ClientContactResponseDto } from '@/api/response/client';
 
 export type NewTransactionFormValues = z.infer<typeof formSchema>;
 
@@ -51,7 +51,7 @@ export interface NewTransactionFormProps {
   onSubmitAction: (values: NewTransactionFormValues) => void;
   isPending: boolean;
   defaultValues?: SomePartial<NewTransactionFormValues, 'paymentCode'>;
-  recipients: Array<RecipientDto>;
+  recipients: Array<ClientContactResponseDto>;
   accounts: Array<AccountDto>;
 }
 
@@ -82,20 +82,22 @@ export default function NewTransactionForm({
   }
 
   const updatedRecipients = [
-    { name: 'New recipient', account: '' },
+    { nickname: 'New recipient', accountNumber: '' },
     ...recipients,
   ];
 
   const handleRecipientChange = (value: string) => {
     const selectedRecipient = updatedRecipients.find(
-      (recipient) => recipient.name === value
+      (recipient) => recipient.nickname === value
     );
     if (selectedRecipient) {
       form.setValue(
         'recipientName',
-        selectedRecipient.name == 'New recipient' ? '' : selectedRecipient.name
+        selectedRecipient.nickname == 'New recipient'
+          ? ''
+          : selectedRecipient.nickname
       );
-      form.setValue('recipientAccount', selectedRecipient.account);
+      form.setValue('recipientAccount', selectedRecipient.accountNumber);
       form.clearErrors(['recipientName', 'recipientAccount']);
     }
   };
@@ -113,13 +115,13 @@ export default function NewTransactionForm({
             <SelectContent>
               {updatedRecipients.map(
                 (
-                  recipient: {
-                    name: string;
-                  },
+                  recipient:
+                    | ClientContactResponseDto
+                    | { nickname: string; accountNumber: string },
                   index: number
                 ) => (
-                  <SelectItem key={index} value={recipient.name}>
-                    {recipient.name}
+                  <SelectItem key={index} value={recipient.nickname}>
+                    {recipient.nickname}
                   </SelectItem>
                 )
               )}
