@@ -1,35 +1,60 @@
 import { Axios } from 'axios';
-import { LoansResponseDto } from './response/loans';
+import { LoanStatus, LoanType } from '@/types/loan';
+import { LoansResponseDto, LoanRequestsResponseDto } from '@/api/response/loan';
 
-//TODO: define LoanFilters interface
 export interface LoanFilters {
-  date?: Date;
-  type?: string;
-  amount?: number;
-  loanNumber?: number;
+  loanType?: LoanType;
+  loanStatus?: LoanStatus;
+  accountNumber?: string;
+}
+
+export interface LoanRequestFilters {
+  loanType?: LoanType;
+  accountNumber?: string;
 }
 
 export const searchLoans = async (
   client: Axios,
-  filters: LoanFilters,
   page: number,
   size: number
-) =>
-  client.get<LoansResponseDto>(`/loans/me`, {
-    params: { ...filters, page, size },
+) => {
+  return client.get<LoansResponseDto>('/loans/me', {
+    params: { page, size },
   });
+};
 
 export const searchAllLoans = async (
   client: Axios,
-  filters: {
-    type: string;
-    loanNumber: string;
-    status: string;
-  },
-  rowsPerPage: number,
-  currentPage: number
+  filters: LoanFilters,
+  page: number,
+  size: number
 ) => {
+  const cleanedFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => value !== '')
+  );
+
   return client.get<LoansResponseDto>('/loans/search', {
-    params: { ...filters, size: rowsPerPage, page: currentPage },
+    params: { ...cleanedFilters, page, size },
   });
+};
+export const searchAllLoanRequests = async (
+  client: Axios,
+  filters: LoanRequestFilters,
+  page: number,
+  size: number
+) => {
+  const cleanedFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => value !== '')
+  );
+
+  return client.get<LoanRequestsResponseDto>('/loans/search-requested', {
+    params: { ...cleanedFilters, page, size },
+  });
+};
+export const approveLoan = async (client: Axios, loanNumber: number) => {
+  return client.put<void>(`/loans/approve/${loanNumber}`);
+};
+
+export const rejectLoan = async (client: Axios, loanNumber: number) => {
+  return client.put<void>(`/loans/reject/${loanNumber}`);
 };

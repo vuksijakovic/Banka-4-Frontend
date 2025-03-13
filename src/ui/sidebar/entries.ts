@@ -176,6 +176,12 @@ const EmployeeGroups: SidebarGroupType[] = [
         icon: List,
         privileges: [],
       },
+      {
+        title: 'Requests',
+        url: '/e/loans/requests',
+        icon: List,
+        privileges: [],
+      },
     ],
   },
 ];

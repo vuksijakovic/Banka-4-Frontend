@@ -14,27 +14,26 @@ import { useQuery } from '@tanstack/react-query';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
-import { searchAllLoans } from '@/api/loans';
+import { LoanFilters, searchAllLoans } from '@/api/loans';
 import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
+import { ALL_LOAN_STATUSES, ALL_LOAN_TYPES } from '@/types/loan';
 
-interface LoanFilter {
-  type: string;
-  loanNumber: string;
-  status: string;
-}
-
-const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
-  type: {
-    filterType: 'string',
+const loanFilterColumns: Record<keyof LoanFilters, FilterDefinition> = {
+  loanType: {
+    filterType: 'enum',
     placeholder: 'Enter loan type',
+    options: ALL_LOAN_TYPES,
+    optionToString: (option) => option,
   },
-  loanNumber: {
+  accountNumber: {
     filterType: 'string',
-    placeholder: 'Enter loan number',
+    placeholder: 'Enter account number',
   },
-  status: {
-    filterType: 'string',
+  loanStatus: {
+    filterType: 'enum',
     placeholder: 'Enter status',
+    options: ALL_LOAN_STATUSES,
+    optionToString: (option) => option,
   },
 };
 
@@ -44,10 +43,10 @@ const LoansOverviewPage: React.FC = () => {
     page: 0,
   });
 
-  const [searchFilter, setSearchFilter] = useState<LoanFilter>({
-    type: '',
-    loanNumber: '',
-    status: '',
+  const [searchFilter, setSearchFilter] = useState<LoanFilters>({
+    loanType: undefined,
+    accountNumber: '',
+    loanStatus: undefined,
   });
 
   const client = useHttpClient();
@@ -55,7 +54,7 @@ const LoansOverviewPage: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['loans', page, pageSize, searchFilter],
     queryFn: async () =>
-      (await searchAllLoans(client, searchFilter, pageSize, page)).data,
+      (await searchAllLoans(client, searchFilter, page, pageSize)).data,
   });
 
   const { dispatch } = useBreadcrumb();
@@ -81,7 +80,7 @@ const LoansOverviewPage: React.FC = () => {
               making it easy to review key details and track relevant
               information.
             </CardDescription>
-            <FilterBar<LoanFilter, typeof loanFilterColumns>
+            <FilterBar<LoanFilters, typeof loanFilterColumns>
               onSubmit={(filter) => {
                 setPage(0);
                 setSearchFilter(filter);
