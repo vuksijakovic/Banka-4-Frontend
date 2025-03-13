@@ -7,6 +7,8 @@ import {
   CardDescription,
   CardHeader,
 } from '@/components/ui/card';
+import { ColumnDef, Row } from '@tanstack/react-table';
+import { LoanDto } from '@/api/response/loans';
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
@@ -105,7 +107,7 @@ const LoansRequestsPage: React.FC = () => {
     {
       id: 'actions',
       header: 'Actions',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: Row<LoanDto> }) => (
         <div className="flex gap-2">
           <AlertDialog>
             <AlertDialogTrigger asChild>
