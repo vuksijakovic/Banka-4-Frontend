@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { LoanDto } from '@/api/response/loans';
+import { LoanDto } from '@/api/response/loan';
 
 export const loansColumns: ColumnDef<LoanDto>[] = [
   {

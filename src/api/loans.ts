@@ -1,9 +1,10 @@
 import { Axios } from 'axios';
-import { LoansResponseDto } from './response/loans';
+import { LoanStatus, LoanType } from '@/types/loan';
+import { LoansResponseDto } from '@/api/response/loan';
 
 export interface LoanFilters {
-  loanType?: string;
-  loanStatus?: string;
+  loanType?: LoanType;
+  loanStatus?: LoanStatus;
   accountNumber?: string;
 }
 
@@ -19,11 +20,7 @@ export const searchLoans = async (
 
 export const searchAllLoans = async (
   client: Axios,
-  filters: {
-    loanType?: string;
-    accountNumber?: string;
-    loanStatus?: string;
-  },
+  filters: LoanFilters,
   page: number,
   size: number
 ) => {
