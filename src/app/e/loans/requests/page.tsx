@@ -7,38 +7,41 @@ import {
   CardDescription,
   CardHeader,
 } from '@/components/ui/card';
-import { ColumnDef, Row } from '@tanstack/react-table';
-import { LoanDto } from '@/api/response/loans';
+import { Row } from '@tanstack/react-table';
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
-import { searchAllLoans, approveLoan, rejectLoan } from '@/api/loans';
+import { approveLoan, rejectLoan, searchAllLoans } from '@/api/loans';
 import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
-  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { ALL_LOAN_TYPES, LoanType } from '@/types/loan';
+import { LoanDto } from '@/api/response/loan';
 
-interface LoanFilter {
-  loanType: string;
+type LoanFilter = Partial<{
+  loanType: LoanType;
   accountNumber: string;
-}
+}>;
 
 const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
   loanType: {
-    filterType: 'string',
+    filterType: 'enum',
     placeholder: 'Enter loan type',
+    options: ALL_LOAN_TYPES,
+    optionToString: (option) => option,
   },
   accountNumber: {
     filterType: 'string',
@@ -56,7 +59,7 @@ const LoansRequestsPage: React.FC = () => {
   );
 
   const [searchFilter, setSearchFilter] = useState<LoanFilter>({
-    loanType: '',
+    loanType: undefined,
     accountNumber: '',
   });
 

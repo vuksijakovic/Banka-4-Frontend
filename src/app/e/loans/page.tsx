@@ -14,27 +14,26 @@ import { useQuery } from '@tanstack/react-query';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
-import { searchAllLoans } from '@/api/loans';
+import { LoanFilters, searchAllLoans } from '@/api/loans';
 import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
+import { ALL_LOAN_STATUSES, ALL_LOAN_TYPES } from '@/types/loan';
 
-interface LoanFilter {
-  loanType: string;
-  accountNumber: string;
-  loanStatus: string;
-}
-
-const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
+const loanFilterColumns: Record<keyof LoanFilters, FilterDefinition> = {
   loanType: {
-    filterType: 'string',
+    filterType: 'enum',
     placeholder: 'Enter loan type',
+    options: ALL_LOAN_TYPES,
+    optionToString: (option) => option,
   },
   accountNumber: {
     filterType: 'string',
     placeholder: 'Enter account number',
   },
   loanStatus: {
-    filterType: 'string',
+    filterType: 'enum',
     placeholder: 'Enter status',
+    options: ALL_LOAN_STATUSES,
+    optionToString: (option) => option,
   },
 };
 
@@ -44,10 +43,10 @@ const LoansOverviewPage: React.FC = () => {
     page: 0,
   });
 
-  const [searchFilter, setSearchFilter] = useState<LoanFilter>({
-    loanType: '',
+  const [searchFilter, setSearchFilter] = useState<LoanFilters>({
+    loanType: undefined,
     accountNumber: '',
-    loanStatus: '',
+    loanStatus: undefined,
   });
 
   const client = useHttpClient();
@@ -81,7 +80,7 @@ const LoansOverviewPage: React.FC = () => {
               making it easy to review key details and track relevant
               information.
             </CardDescription>
-            <FilterBar<LoanFilter, typeof loanFilterColumns>
+            <FilterBar<LoanFilters, typeof loanFilterColumns>
               onSubmit={(filter) => {
                 setPage(0);
                 setSearchFilter(filter);
