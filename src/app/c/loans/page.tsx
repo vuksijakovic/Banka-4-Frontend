@@ -42,7 +42,7 @@ const ClientLoanOverviewPage: React.FC = () => {
   const { data: loans, isLoading } = useQuery<LoansResponseDto>({
     queryKey: ['loans', page, pageSize],
     queryFn: async () => {
-      return (await searchLoans(client,  page, pageSize)).data;
+      return (await searchLoans(client, page, pageSize)).data;
     },
   });
 
