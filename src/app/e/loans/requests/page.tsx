@@ -8,7 +8,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Row } from '@tanstack/react-table';
-import { LoanDto } from '@/api/response/loan';
+import { LoanRequestDto } from '@/api/response/loan';
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
@@ -18,11 +18,11 @@ import useTablePageParams from '@/hooks/useTablePageParams';
 import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
 import {
   LoanFilters,
-  searchAllLoans,
+  searchAllLoanRequests,
   approveLoan,
   rejectLoan,
 } from '@/api/loans';
-import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
+import { loanRequestColumns } from '@/ui/dataTables/loans/loansOverviewColums';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { LoanStatus, LoanType } from '@/types/loan';
@@ -63,14 +63,8 @@ const LoansRequestsPage: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['loan-requests', page, pageSize, searchFilter],
     queryFn: async () =>
-      (
-        await searchAllLoans(
-          client,
-          { ...searchFilter, loanStatus: 'PROCESSING' },
-          page,
-          pageSize
-        )
-      ).data,
+      (await searchAllLoanRequests(client, { ...searchFilter }, page, pageSize))
+        .data,
   });
 
   const approveMutation = useMutation({
@@ -114,11 +108,11 @@ const LoansRequestsPage: React.FC = () => {
   };
 
   const columnsWithActions = [
-    ...loansColumns,
+    ...loanRequestColumns,
     {
       id: 'actions',
       header: 'Actions',
-      cell: ({ row }: { row: Row<LoanDto> }) => (
+      cell: ({ row }: { row: Row<LoanRequestDto> }) => (
         <div className="flex gap-2">
           <Button onClick={() => handleApprove(row.original.loanNumber)}>
             Approve

@@ -19,4 +19,19 @@ export interface LoanDto {
   interestType: InterestType;
 }
 
+export interface LoanRequestDto {
+  loanType: LoanType;
+  amount: number;
+  currency: CurrencyDto;
+  purposeOfLoan: string;
+  monthlyIncome: number;
+  employmentStatus: string;
+  employmentPeriod: number;
+  repaymentPeriod: number;
+  contactPhone: string;
+  accountNumber: string;
+  loanNumber: number;
+}
+
 export type LoansResponseDto = Pageable<LoanDto>;
+export type LoanRequestsResponseDto = Pageable<LoanRequestDto>;

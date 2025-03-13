@@ -1,10 +1,15 @@
 import { Axios } from 'axios';
 import { LoanStatus, LoanType } from '@/types/loan';
-import { LoansResponseDto } from '@/api/response/loan';
+import { LoansResponseDto, LoanRequestsResponseDto } from '@/api/response/loan';
 
 export interface LoanFilters {
   loanType?: LoanType;
   loanStatus?: LoanStatus;
+  accountNumber?: string;
+}
+
+export interface LoanRequestFilters {
+  loanType?: LoanType;
   accountNumber?: string;
 }
 
@@ -32,7 +37,20 @@ export const searchAllLoans = async (
     params: { ...cleanedFilters, page, size },
   });
 };
+export const searchAllLoanRequests = async (
+  client: Axios,
+  filters: LoanRequestFilters,
+  page: number,
+  size: number
+) => {
+  const cleanedFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, value]) => value !== '')
+  );
 
+  return client.get<LoanRequestsResponseDto>('/loans/search-requested', {
+    params: { ...cleanedFilters, page, size },
+  });
+};
 export const approveLoan = async (client: Axios, loanNumber: number) => {
   return client.put<void>(`/loans/approve/${loanNumber}`);
 };
