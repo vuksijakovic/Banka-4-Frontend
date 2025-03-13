@@ -1,29 +1,28 @@
 'use client';
 
-import { useQuery, useMutation } from '@tanstack/react-query';
-import TransferForm from '@/components/transfer/transfer-form';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import TransferForm, {
+  TransferFormValues,
+} from '@/components/transfer/transfer-form';
 import { postNewTransfer } from '@/api/transfer';
 import { AccountDto } from '@/api/response/account';
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useEffect, useState } from 'react';
 import {
   Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
   CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { getClientAccounts } from '@/api/account';
 import { toastRequestError } from '@/api/errors';
 import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
-
-interface TransferData {
-  fromAccount: string;
-  toAccount: string;
-  fromAmount: number;
-}
+import { Dialog2FA } from '@/components/Dialog2FA';
+import { NewTransferRequest } from '@/api/request/transfer';
+import { toast } from 'sonner';
 
 export default function TransferPage() {
   const { dispatch } = useBreadcrumb();
@@ -43,26 +42,44 @@ export default function TransferPage() {
     data: accounts = [],
     isLoading,
     error,
+    isError,
   } = useQuery<AccountDto[]>({
     queryKey: ['accounts'],
     queryFn: async () => (await getClientAccounts(client)).data,
   });
 
-  const [isTransferSuccessful, setIsTransferSuccessful] = useState(false);
+  useEffect(() => {
+    if (isError) {
+      toastRequestError(error);
+    }
+  }, [isError, error]);
+
+  const [is2FAOpen, setIs2FAOpen] = useState(false);
+  const [pendingTransfer, setPendingTransfer] = useState<TransferFormValues>();
 
   const mutation = useMutation({
-    mutationFn: (transferData: TransferData) =>
+    mutationFn: (transferData: NewTransferRequest) =>
       postNewTransfer(client, transferData),
     onSuccess: () => {
-      setIsTransferSuccessful(true);
+      toast.success('transfer was successful!');
     },
     onError: (error) => {
       toastRequestError(error);
     },
   });
 
-  const handleTransferSubmit = (transferData: TransferData) => {
-    mutation.mutate(transferData);
+  const handleTransferSubmit = (formData: TransferFormValues) => {
+    setPendingTransfer(formData);
+    setIs2FAOpen(true);
+  };
+
+  const handle2FASubmit = async (otp: string) => {
+    if (pendingTransfer === undefined) {
+      throw Error('illegal state.');
+    }
+
+    setIs2FAOpen(false);
+    mutation.mutate({ ...pendingTransfer, otpCode: otp });
   };
 
   return (
@@ -77,7 +94,11 @@ export default function TransferPage() {
           </CardHeader>
 
           <CardContent>
-            <TransferForm accounts={accounts} onSubmit={handleTransferSubmit} />
+            <TransferForm
+              accounts={accounts}
+              onSubmit={handleTransferSubmit}
+              isPending={isLoading}
+            />
           </CardContent>
 
           <CardFooter>
@@ -87,6 +108,11 @@ export default function TransferPage() {
           </CardFooter>
         </Card>
       </div>
+      <Dialog2FA
+        open={is2FAOpen}
+        onSubmit={handle2FASubmit}
+        onCancel={() => setIs2FAOpen(false)}
+      />
     </GuardBlock>
   );
 }
