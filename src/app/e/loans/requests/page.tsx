@@ -8,33 +8,30 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Row } from '@tanstack/react-table';
+import { LoanDto } from '@/api/response/loan';
 import { useHttpClient } from '@/context/HttpClientContext';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
 import GuardBlock from '@/components/GuardBlock';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DataTable } from '@/components/dataTable/DataTable';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import FilterBar, { FilterDefinition } from '@/components/filters/FilterBar';
-import { approveLoan, rejectLoan, searchAllLoans } from '@/api/loans';
+import {
+  LoanFilters,
+  searchAllLoans,
+  approveLoan,
+  rejectLoan,
+} from '@/api/loans';
 import { loansColumns } from '@/ui/dataTables/loans/loansOverviewColums';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { ALL_LOAN_TYPES, LoanType } from '@/types/loan';
-import { LoanDto } from '@/api/response/loan';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { LoanStatus, LoanType } from '@/types/loan';
+import { ALL_LOAN_STATUSES, ALL_LOAN_TYPES } from '@/types/loan';
 
-type LoanFilter = Partial<{
-  loanType: LoanType;
-  accountNumber: string;
-}>;
+interface LoanFilter {
+  loanType?: LoanType;
+  accountNumber?: string;
+}
 
 const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
   loanType: {
@@ -52,13 +49,10 @@ const loanFilterColumns: Record<keyof LoanFilter, FilterDefinition> = {
 const LoansRequestsPage: React.FC = () => {
   const { page, pageSize, setPage, setPageSize } = useTablePageParams(
     'loan-requests',
-    {
-      pageSize: 8,
-      page: 0,
-    }
+    { pageSize: 8, page: 0 }
   );
 
-  const [searchFilter, setSearchFilter] = useState<LoanFilter>({
+  const [searchFilter, setSearchFilter] = useState<LoanFilters>({
     loanType: undefined,
     accountNumber: '',
   });
@@ -105,6 +99,20 @@ const LoansRequestsPage: React.FC = () => {
     });
   }, [dispatch]);
 
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [selectedLoan, setSelectedLoan] = useState<number | null>(null);
+
+  const handleApprove = (loanNumber: number) => {
+    setSelectedLoan(loanNumber);
+    setApproveDialogOpen(true);
+  };
+
+  const handleReject = (loanNumber: number) => {
+    setSelectedLoan(loanNumber);
+    setRejectDialogOpen(true);
+  };
+
   const columnsWithActions = [
     ...loansColumns,
     {
@@ -112,46 +120,15 @@ const LoansRequestsPage: React.FC = () => {
       header: 'Actions',
       cell: ({ row }: { row: Row<LoanDto> }) => (
         <div className="flex gap-2">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button>Approve</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
-              </AlertDialogHeader>
-              <p>Are you sure you want to approve this loan?</p>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() =>
-                    approveMutation.mutate(row.original.loanNumber)
-                  }
-                >
-                  Confirm
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">Deny</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Denial</AlertDialogTitle>
-              </AlertDialogHeader>
-              <p>Are you sure you want to deny this loan?</p>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => rejectMutation.mutate(row.original.loanNumber)}
-                >
-                  Confirm
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <Button onClick={() => handleApprove(row.original.loanNumber)}>
+            Approve
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => handleReject(row.original.loanNumber)}
+          >
+            Deny
+          </Button>
         </div>
       ),
     },
@@ -191,6 +168,33 @@ const LoansRequestsPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmDialog
+        open={approveDialogOpen}
+        title="Confirm Approval"
+        description="Are you sure you want to approve this loan?"
+        onConfirm={async () => {
+          if (selectedLoan !== null) {
+            await approveMutation.mutateAsync(selectedLoan);
+            setApproveDialogOpen(false);
+          }
+        }}
+        onCancel={() => setApproveDialogOpen(false)}
+      />
+
+      <ConfirmDialog
+        open={rejectDialogOpen}
+        title="Confirm Denial"
+        description="Are you sure you want to deny this loan?"
+        buttonText="Deny"
+        onConfirm={async () => {
+          if (selectedLoan !== null) {
+            await rejectMutation.mutateAsync(selectedLoan);
+            setRejectDialogOpen(false);
+          }
+        }}
+        onCancel={() => setRejectDialogOpen(false)}
+      />
     </GuardBlock>
   );
 };
