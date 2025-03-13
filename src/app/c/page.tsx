@@ -1,27 +1,32 @@
 'use client';
 
-import { TransactionsResponseDto } from '@/api/response/transaction';
 import { AccountDto } from '@/api/response/account';
 import React, { useEffect, useState } from 'react';
 import { AccountCarousel } from '@/components/account/account-carousel';
-import { DataTable } from '@/components/dataTable/DataTable';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useHttpClient } from '@/context/HttpClientContext';
-import { formatAccountNumber } from '@/lib/account-utils';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from '@/components/ui/card';
-import { transactionColumns } from '@/ui/dataTables/transactions/transactionColumns';
 import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
-import { searchTransactions } from '@/api/transaction';
-import useTablePageParams from '@/hooks/useTablePageParams';
 import { getClientAccounts } from '@/api/account';
+import { blockCard, createCard } from '@/api/cards';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TransactionsCard from '@/components/client-landing-page/transactions-card';
+import {
+  CardRequestAction,
+  CardsTableCard,
+} from '@/components/client-landing-page/cards-table-card';
+import { toastRequestError } from '@/api/errors';
+import { toast } from 'sonner';
+import { CreateCardRequest } from '@/api/request/card';
+import moment from 'moment';
 
-const ClientHomePage: React.FC = () => {
+export default function ClientPage() {
+  const [selectedAccount, setSelectedAccount] = useState<AccountDto | null>(
+    null
+  );
+  const client = useHttpClient();
+  const queryClient = useQueryClient();
+
   const { dispatch } = useBreadcrumb();
   useEffect(() => {
     dispatch({
@@ -30,43 +35,66 @@ const ClientHomePage: React.FC = () => {
     });
   }, [dispatch]);
 
-  const [selectedAccount, setSelectedAccount] = useState<AccountDto | null>(
-    null
-  );
-  const client = useHttpClient();
-  const { page, pageSize, setPage, setPageSize } = useTablePageParams(
-    'transactions',
-    { pageSize: 8, page: 0 }
-  );
-
-  const { data: accounts } = useQuery<AccountDto[]>({
+  const { data: accounts, isSuccess } = useQuery<AccountDto[]>({
     queryKey: ['accounts'],
     queryFn: async () => {
-      const response = await getClientAccounts(client);
-      return response.data;
+      return (await getClientAccounts(client)).data;
     },
-  });
-
-  const { data: transactions, isLoading } = useQuery<TransactionsResponseDto>({
-    queryKey: ['transactions', page, pageSize, selectedAccount?.accountNumber],
-    queryFn: async () => {
-      return (
-        await searchTransactions(
-          client,
-          { accountNumber: selectedAccount?.accountNumber },
-          page,
-          pageSize
-        )
-      ).data;
-    },
-    enabled: !!selectedAccount,
   });
 
   useEffect(() => {
-    if (accounts && accounts.length > 0 && !selectedAccount) {
-      setSelectedAccount(accounts[0]);
+    if (isSuccess) {
+      if (accounts.length > 0) {
+        setSelectedAccount(accounts[0]);
+      }
     }
-  }, [accounts, selectedAccount]);
+  }, [isSuccess, setSelectedAccount, accounts]);
+
+  const { mutate: doBlockCard } = useMutation({
+    mutationFn: async (cardNumber: string) =>
+      await blockCard(client, cardNumber),
+    onError: (error) => toastRequestError(error),
+    onSuccess: () => {
+      toast.success('card blocked successfully!');
+      queryClient.invalidateQueries({ queryKey: ['cards'], exact: false });
+    },
+  });
+
+  const { mutate: doCreateCard } = useMutation({
+    mutationFn: async (data: CreateCardRequest) =>
+      await createCard(client, data),
+    onError: (error) => toastRequestError(error),
+    onSuccess: () => {
+      toast.success('card created successfully!');
+      queryClient.invalidateQueries({ queryKey: ['cards'], exact: false });
+    },
+  });
+
+  const onCreateCardRequest = (request: CardRequestAction) => {
+    if (request.isBusiness && !request.isSelf) {
+      doCreateCard({
+        createAuthorizedUserDto: {
+          firstName: request.authorizedUser.firstName,
+          lastName: request.authorizedUser.lastName,
+          dateOfBirth: moment(request.authorizedUser.dateOfBirth).format(
+            'YYYY-MM-DD'
+          ),
+          gender: request.authorizedUser.gender,
+          email: request.authorizedUser.email,
+          phoneNumber: request.authorizedUser.phoneNumber,
+          address: request.authorizedUser.address,
+        },
+        accountNumber: request.accountNumber,
+        otpCode: request.otpCode,
+      });
+    } else {
+      doCreateCard({
+        createAuthorizedUserDto: null,
+        accountNumber: request.accountNumber,
+        otpCode: request.otpCode,
+      });
+    }
+  };
 
   return (
     <GuardBlock requiredUserType={'client'}>
@@ -79,7 +107,7 @@ const ClientHomePage: React.FC = () => {
             owner: account.client.firstName + ' ' + account.client.lastName,
             type: account.accountType,
             availableBalance: account.availableBalance,
-            reservedBalance: 0 /* TODO(marko): this sprint, reservedBalance is always 0, fix this when the time comes */,
+            reservedBalance: 0,
           }))}
           onSelect={(accountNumber: string) => {
             const account =
@@ -90,36 +118,37 @@ const ClientHomePage: React.FC = () => {
         />
       )}
       {selectedAccount && (
-        <div className={'flex flex-col items-center justify-center'}>
-          <Card className="max-w-[900px] w-full mx-auto">
-            <CardHeader>
-              <h1 className="text-2xl font-bold">
-                Transactions for Account:{' '}
-                {formatAccountNumber(selectedAccount.accountNumber)}
-              </h1>
-              <CardDescription>
-                This table provides a clear and organized overview of key
-                transactions details for quick reference and easy access.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DataTable
-                columns={transactionColumns}
-                data={transactions?.content ?? []}
-                isLoading={isLoading}
-                pagination={{ page, pageSize }}
-                onPaginationChange={(pagination) => {
-                  setPage(pagination.page);
-                  setPageSize(pagination.pageSize);
-                }}
-                pageCount={transactions?.page.totalPages ?? 0}
+        <div className={'flex items-center justify-center'}>
+          <Tabs defaultValue="transactions" className="w-[900px]">
+            <TabsList className={'w-full'}>
+              <TabsTrigger
+                value="transactions"
+                className="px-6 py-2 rounded-lg w-full"
+              >
+                Transactions
+              </TabsTrigger>
+              <TabsTrigger
+                value="cards"
+                className="px-6 py-2 rounded-lg w-full"
+              >
+                Cards
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="transactions">
+              <TransactionsCard selectedAccount={selectedAccount} />
+            </TabsContent>
+
+            <TabsContent value="cards">
+              <CardsTableCard
+                onBlockCardAction={doBlockCard}
+                onRequestCardAction={onCreateCardRequest}
+                selectedAccount={selectedAccount}
               />
-            </CardContent>
-          </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
     </GuardBlock>
   );
-};
-
-export default ClientHomePage;
+}
