@@ -108,6 +108,7 @@ export default function ClientPage() {
             type: account.accountType,
             availableBalance: account.availableBalance,
             reservedBalance: 0,
+            company: account.company,
           }))}
           onSelect={(accountNumber: string) => {
             const account =

@@ -50,6 +50,11 @@ export function AccountCarousel({
                     <CardTitle className="font-normal text-md text-muted-foreground">
                       {formatAccountNumber(item.accountNumber)}
                     </CardTitle>
+                    {item.company && (
+                      <p className="text-sm text-muted-foreground">
+                        Company: {item.company.name}
+                      </p>
+                    )}
                     <span className="text-4xl font-bold">
                       {item.balance.toLocaleString()} {item.currencyCode}
                     </span>

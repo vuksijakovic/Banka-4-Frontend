@@ -1,3 +1,5 @@
+import { CompanyResponseDto } from '@/api/response/company';
+
 export interface TransactionCarouselItem {
   accountNumber: string;
   balance: number;
@@ -6,4 +8,5 @@ export interface TransactionCarouselItem {
   type: string;
   availableBalance: number;
   reservedBalance: number;
+  company?: CompanyResponseDto;
 }

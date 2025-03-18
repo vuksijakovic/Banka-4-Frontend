@@ -63,6 +63,60 @@ export function ViewAccountForm(transaction: TransactionCarouselItem) {
           value={`${transaction.balance.toLocaleString()} ${transaction.currencyCode}`}
         />
       </div>
+      {(transaction.type === 'CheckingBusiness' ||
+        transaction.type === 'FxBusiness') &&
+        transaction.company && (
+          <>
+            <div className="col-span-2">
+              <h3 className="text-lg font-semibold">Company Information</h3>
+            </div>
+            <div className="flex flex-col col-span-1">
+              <Label>Company Name:</Label>
+              <Input
+                disabled
+                type="text"
+                className={'disabled:cursor-default'}
+                value={transaction.company.name}
+              />
+            </div>
+            <div className="flex flex-col col-span-1">
+              <Label>Tax Identification Number:</Label>
+              <Input
+                disabled
+                type="text"
+                className={'disabled:cursor-default'}
+                value={transaction.company.tin}
+              />
+            </div>
+            <div className="flex flex-col col-span-1">
+              <Label>Company Registration Number:</Label>
+              <Input
+                disabled
+                type="text"
+                className={'disabled:cursor-default'}
+                value={transaction.company.crn}
+              />
+            </div>
+            <div className="flex flex-col col-span-1">
+              <Label>Address:</Label>
+              <Input
+                disabled
+                type="text"
+                className={'disabled:cursor-default'}
+                value={transaction.company.address}
+              />
+            </div>
+            <div className="flex flex-col col-span-1">
+              <Label>Activity Code:</Label>
+              <Input
+                disabled
+                type="text"
+                className={'disabled:cursor-default'}
+                value={transaction.company.activityCode}
+              />
+            </div>
+          </>
+        )}
     </form>
   );
 }
