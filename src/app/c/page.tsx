@@ -73,7 +73,7 @@ export default function ClientPage() {
   const onCreateCardRequest = (request: CardRequestAction) => {
     if (request.isBusiness && !request.isSelf) {
       doCreateCard({
-        createAuthorizedUserDto: {
+        authorizedUser: {
           firstName: request.authorizedUser.firstName,
           lastName: request.authorizedUser.lastName,
           dateOfBirth: moment(request.authorizedUser.dateOfBirth).format(
@@ -89,7 +89,7 @@ export default function ClientPage() {
       });
     } else {
       doCreateCard({
-        createAuthorizedUserDto: null,
+        authorizedUser: null,
         accountNumber: request.accountNumber,
         otpCode: request.otpCode,
       });

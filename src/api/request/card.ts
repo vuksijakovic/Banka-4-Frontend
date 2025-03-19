@@ -2,7 +2,7 @@ import { Gender } from '@/types/gender';
 
 export interface CreateCardRequest {
   accountNumber: string;
-  createAuthorizedUserDto: CreateAuthorizedUserRequest | null;
+  authorizedUser: CreateAuthorizedUserRequest | null;
   otpCode: string;
 }
 
