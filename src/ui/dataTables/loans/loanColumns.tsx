@@ -13,9 +13,10 @@ export const loanColumns: ColumnDef<LoanDto>[] = [
   {
     accessorKey: 'amount',
     header: 'Total loan amount',
-  },
-  {
-    accessorKey: 'currency.code',
-    header: 'Currency',
+    cell: (info) => {
+      const amount = info.getValue<number>();
+      const currencyCode = info.row.original.currency.code;
+      return `${amount.toLocaleString()} ${currencyCode}`;
+    },
   },
 ];
