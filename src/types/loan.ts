@@ -6,8 +6,12 @@ export const ALL_LOAN_STATUSES_ = [
   'PROCESSING',
 ] as const;
 
+export const ALL_PAYMENT_STATUSES_ = ['PAID', 'UNPAID', 'DELAYED'] as const;
+
 export type LoanStatus = (typeof ALL_LOAN_STATUSES_)[number];
 export const ALL_LOAN_STATUSES: LoanStatus[] = [...ALL_LOAN_STATUSES_];
+
+export type PaymentStatus = (typeof ALL_PAYMENT_STATUSES_)[number];
 
 export const ALL_INTEREST_TYPES_ = ['FIXED', 'VARIABLE'] as const;
 
