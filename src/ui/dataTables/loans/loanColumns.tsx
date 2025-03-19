@@ -1,4 +1,4 @@
-import { ColumnDef, Row } from '@tanstack/react-table';
+import { Row } from '@tanstack/react-table';
 import { LoanDto } from '@/api/response/loan';
 import { Button } from '@/components/ui/button';
 
@@ -17,9 +17,9 @@ export const loanColumns = (
   {
     accessorKey: 'amount',
     header: 'Total loan amount',
-    cell: (info) => {
-      const amount = info.getValue<number>();
-      const currencyCode = info.row.original.currency.code;
+    cell: ({ row }: { row: Row<LoanDto> }) => {
+      const amount = row.original.amount;
+      const currencyCode = row.original.currency.code;
       return `${amount.toLocaleString()} ${currencyCode}`;
     },
   },
