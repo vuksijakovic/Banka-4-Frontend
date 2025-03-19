@@ -200,7 +200,11 @@ export function CardsTableCard(props: CardsTableCardProps) {
         </CardHeader>
         <CardContent>
           <DataTable<CardResponseDto>
-            columns={cardColumns(handleBlockCardDialog, handleViewCardDetails)}
+            columns={cardColumns((card) => {
+              if (card.cardStatus !== 'BLOCKED') {
+                handleBlockCardDialog(card);
+              }
+            }, handleViewCardDetails)}
             data={cards?.content ?? []}
             isLoading={isLoadingCards}
             pageCount={cards?.page.totalPages ?? 0}
