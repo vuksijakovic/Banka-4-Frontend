@@ -28,7 +28,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SomePartial } from '@/types/utils';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { getDirtyValues } from '@/lib/form-utils';
-import { ALL_PRIVILEGES, ALL_PRIVILEGES_ } from '@/types/privileges';
+import { CLIENT_PRIVILEGES, CLIENT_PRIVILEGES_ } from '@/types/privileges';
 import { ALL_GENDERS_ } from '@/types/gender';
 
 const formSchema = z.object({
@@ -41,7 +41,7 @@ const formSchema = z.object({
     .regex(/^(\+3816|06)(\d{7,8}|(77|78)\d{5,6})$/, 'Invalid phone number'),
   address: z.string().min(1, 'Address is required'),
   gender: z.enum(ALL_GENDERS_, { required_error: 'Gender is required' }),
-  privilege: z.union([z.tuple([]), z.array(z.enum(ALL_PRIVILEGES_))]),
+  privilege: z.union([z.tuple([]), z.array(z.enum(CLIENT_PRIVILEGES_))]),
 });
 
 export type ClientFormAction =
@@ -264,7 +264,7 @@ export default function ClientForm({
               <FormControl>
                 <MultiSelect
                   maxCount={5}
-                  options={ALL_PRIVILEGES.map((priv) => ({
+                  options={CLIENT_PRIVILEGES.map((priv) => ({
                     label: priv,
                     value: priv,
                   }))}
