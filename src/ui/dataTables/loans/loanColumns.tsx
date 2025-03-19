@@ -3,8 +3,8 @@ import { LoanDto } from '@/api/response/loan';
 import { Button } from '@/components/ui/button';
 
 export const loanColumns = (
-  handleViewDetails: (arg0: any) => void,
-  handleViewInstallments: (arg0: any) => void
+  handleViewDetails: (loan: LoanDto) => void,
+  handleViewInstallments: (loanNumber: number) => void
 ) => [
   {
     accessorKey: 'type',
