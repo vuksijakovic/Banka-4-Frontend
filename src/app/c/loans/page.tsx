@@ -99,7 +99,6 @@ const ClientLoanOverviewPage: React.FC = () => {
                 setPageSize(pagination.pageSize);
               }}
               pageCount={loans?.page.totalPages ?? 0}
-              
             />
           </CardContent>
         </Card>
