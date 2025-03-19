@@ -201,7 +201,7 @@ export function CardsTableCard(props: CardsTableCardProps) {
         <CardContent>
           <DataTable<CardResponseDto>
             columns={cardColumns((card) => {
-              if (card.cardStatus !== 'BLOCKED') {
+              if (card.cardStatus === 'ACTIVATED') {
                 handleBlockCardDialog(card);
               }
             }, handleViewCardDetails)}

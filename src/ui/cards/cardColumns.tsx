@@ -40,7 +40,7 @@ export const cardColumns = (
       return (
         <div className="flex space-x-2">
           <Button onClick={() => onInfo(card)}>Info</Button>
-          {card.cardStatus !== 'BLOCKED' && (
+          {card.cardStatus === 'ACTIVATED' && (
             <Button onClick={() => onBlock(card)} variant="destructive">
               Block
             </Button>
