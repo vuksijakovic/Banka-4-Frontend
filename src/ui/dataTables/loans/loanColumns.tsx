@@ -2,7 +2,10 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 import { LoanDto } from '@/api/response/loan';
 import { Button } from '@/components/ui/button';
 
-export const loanColumns = (handleViewDetails: (arg0: any) => void, handleViewInstallments: (arg0: any) => void) => [
+export const loanColumns = (
+  handleViewDetails: (arg0: any) => void,
+  handleViewInstallments: (arg0: any) => void
+) => [
   {
     accessorKey: 'type',
     header: 'Type',
@@ -25,18 +28,13 @@ export const loanColumns = (handleViewDetails: (arg0: any) => void, handleViewIn
     header: 'Actions',
     cell: ({ row }: { row: Row<LoanDto> }) => (
       <div className="flex gap-2 justify-center items-center">
-        <Button
-          size="sm"
-          onClick={() => handleViewDetails(row.original)}
-        >
+        <Button size="sm" onClick={() => handleViewDetails(row.original)}>
           Details
         </Button>
         <Button
           size="sm"
           variant="outline"
-          onClick={() =>
-            handleViewInstallments(row.original.loanNumber)
-          }
+          onClick={() => handleViewInstallments(row.original.loanNumber)}
         >
           Installments
         </Button>
