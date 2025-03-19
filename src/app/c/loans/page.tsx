@@ -90,32 +90,7 @@ const ClientLoanOverviewPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={[
-                ...loanColumns,
-                {
-                  id: 'actions',
-                  header: 'Actions',
-                  cell: ({ row }) => (
-                    <div className="flex gap-2 justify-center items-center">
-                      <Button
-                        size="sm"
-                        onClick={() => handleViewDetails(row.original)}
-                      >
-                        Details
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          handleViewInstallments(row.original.loanNumber)
-                        }
-                      >
-                        Installments
-                      </Button>
-                    </div>
-                  ),
-                },
-              ]}
+              columns={loanColumns(handleViewDetails, handleViewInstallments)}
               data={loans?.content ?? []}
               isLoading={isLoading}
               pagination={{ page, pageSize }}
@@ -124,6 +99,7 @@ const ClientLoanOverviewPage: React.FC = () => {
                 setPageSize(pagination.pageSize);
               }}
               pageCount={loans?.page.totalPages ?? 0}
+              
             />
           </CardContent>
         </Card>
