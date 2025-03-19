@@ -13,10 +13,13 @@ import {
 } from '@/components/ui/card';
 import GuardBlock from '@/components/GuardBlock';
 import { useBreadcrumb } from '@/context/BreadcrumbContext';
-import { searchLoans } from '@/api/loans';
+import { searchLoans, getLoanInstallments } from '@/api/loans';
 import useTablePageParams from '@/hooks/useTablePageParams';
 import { loanColumns } from '@/ui/dataTables/loans/loanColumns';
 import { LoanDialog } from '@/components/loans/LoanDialog';
+import { LoanInstallmentsDialog } from '@/components/loans/LoanInstallmentsDialog';
+import { Button } from '@/components/ui/button';
+import { LoanInstallmentDto } from '@/api/response/loan';
 
 const ClientLoanOverviewPage: React.FC = () => {
   const { dispatch } = useBreadcrumb();
@@ -33,6 +36,11 @@ const ClientLoanOverviewPage: React.FC = () => {
 
   const [selectedLoan, setSelectedLoan] = useState<LoanDto>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedLoanNumber, setSelectedLoanNumber] = useState<number | null>(
+    null
+  );
+  const [isInstallmentsDialogOpen, setIsInstallmentsDialogOpen] =
+    useState(false);
   const client = useHttpClient();
   const { page, pageSize, setPage, setPageSize } = useTablePageParams('loans', {
     pageSize: 8,
@@ -51,6 +59,11 @@ const ClientLoanOverviewPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
+  const handleViewInstallments = (loanNumber: number) => {
+    setSelectedLoanNumber(loanNumber);
+    setIsInstallmentsDialogOpen(true);
+  };
+
   return (
     <GuardBlock requiredUserType={'client'}>
       {selectedLoan && (
@@ -60,6 +73,12 @@ const ClientLoanOverviewPage: React.FC = () => {
           setOpen={setIsDialogOpen}
         />
       )}
+      <LoanInstallmentsDialog
+        loanNumber={selectedLoanNumber}
+        open={isInstallmentsDialogOpen}
+        setOpen={setIsInstallmentsDialogOpen}
+      />
+      ;
       <div className="p-8">
         <Card className="max-w-[900px] w-full mx-auto">
           <CardHeader>
@@ -71,7 +90,32 @@ const ClientLoanOverviewPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <DataTable
-              columns={loanColumns}
+              columns={[
+                ...loanColumns,
+                {
+                  id: 'actions',
+                  header: 'Actions',
+                  cell: ({ row }) => (
+                    <div className="flex gap-2 justify-center items-center">
+                      <Button
+                        size="sm"
+                        onClick={() => handleViewDetails(row.original)}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          handleViewInstallments(row.original.loanNumber)
+                        }
+                      >
+                        Installments
+                      </Button>
+                    </div>
+                  ),
+                },
+              ]}
               data={loans?.content ?? []}
               isLoading={isLoading}
               pagination={{ page, pageSize }}
@@ -80,7 +124,6 @@ const ClientLoanOverviewPage: React.FC = () => {
                 setPageSize(pagination.pageSize);
               }}
               pageCount={loans?.page.totalPages ?? 0}
-              onRowClick={(row) => handleViewDetails(row.original)}
             />
           </CardContent>
         </Card>

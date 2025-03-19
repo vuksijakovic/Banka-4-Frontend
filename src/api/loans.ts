@@ -1,6 +1,10 @@
 import { Axios } from 'axios';
 import { LoanStatus, LoanType } from '@/types/loan';
-import { LoansResponseDto, LoanRequestsResponseDto } from '@/api/response/loan';
+import {
+  LoansResponseDto,
+  LoanRequestsResponseDto,
+  LoanInstallmentResponseDto,
+} from '@/api/response/loan';
 
 export interface LoanFilters {
   loanType?: LoanType;
@@ -57,4 +61,18 @@ export const approveLoan = async (client: Axios, loanNumber: number) => {
 
 export const rejectLoan = async (client: Axios, loanNumber: number) => {
   return client.put<void>(`/loans/reject/${loanNumber}`);
+};
+
+export const getLoanInstallments = async (
+  client: Axios,
+  loanNumber: number,
+  page: number,
+  size: number
+) => {
+  return client.get<LoanInstallmentResponseDto>(
+    `/loans/installment/${loanNumber}`,
+    {
+      params: { page, size },
+    }
+  );
 };
