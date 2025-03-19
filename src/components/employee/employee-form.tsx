@@ -29,7 +29,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SomePartial } from '@/types/utils';
 
 import { MultiSelect } from '@/components/ui/multi-select';
-import { ALL_PRIVILEGES } from '@/types/privileges';
+import { EMPLOYEE_PRIVILEGES } from '@/types/privileges';
 import { getDirtyValues } from '@/lib/form-utils';
 import { ALL_GENDERS_ } from '@/types/gender';
 
@@ -317,7 +317,7 @@ export default function EmployeeForm({
               <FormControl>
                 <MultiSelect
                   maxCount={5}
-                  options={ALL_PRIVILEGES.map((priv) => ({
+                  options={EMPLOYEE_PRIVILEGES.map((priv) => ({
                     label: priv,
                     value: priv,
                   }))}
