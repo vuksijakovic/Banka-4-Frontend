@@ -48,7 +48,7 @@ export const accountsColumns: ColumnDef<AccountDto>[] = [
             dailyLimit: row.original.dailyLimit,
           }}
         />
-        <Link href={`/c/transactions?an=${row.original.accountNumber}`}>
+        <Link href={`/e/cards?an=${row.original.accountNumber}`}>
           <Button variant="ghost">
             <AlignJustify />
           </Button>
