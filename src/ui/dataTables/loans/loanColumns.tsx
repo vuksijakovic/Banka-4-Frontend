@@ -12,6 +12,10 @@ export const loanColumns: ColumnDef<LoanDto>[] = [
   },
   {
     accessorKey: 'amount',
-    header: 'Amount',
+    header: 'Total loan amount',
+  },
+  {
+    accessorKey: 'currency.code',
+    header: 'Currency',
   },
 ];
