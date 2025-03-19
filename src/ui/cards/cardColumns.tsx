@@ -34,16 +34,19 @@ export const cardColumns = (
   {
     accessorKey: 'actions',
     header: 'Actions',
-    cell: (info) => (
-      <div className="flex space-x-2">
-        <Button onClick={() => onInfo(info.row.original)}>Info</Button>
-        <Button
-          onClick={() => onBlock(info.row.original)}
-          variant="destructive"
-        >
-          Block
-        </Button>
-      </div>
-    ),
+    cell: (info) => {
+      const card = info.row.original;
+
+      return (
+        <div className="flex space-x-2">
+          <Button onClick={() => onInfo(card)}>Info</Button>
+          {card.cardStatus !== 'BLOCKED' && (
+            <Button onClick={() => onBlock(card)} variant="destructive">
+              Block
+            </Button>
+          )}
+        </div>
+      );
+    },
   },
 ];
