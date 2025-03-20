@@ -29,7 +29,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SomePartial } from '@/types/utils';
 
 import { MultiSelect } from '@/components/ui/multi-select';
-import { EMPLOYEE_PRIVILEGES } from '@/types/privileges';
+import { EMPLOYEE_PRIVILEGES, EMPLOYEE_PRIVILEGES_ } from '@/types/privileges';
 import { getDirtyValues } from '@/lib/form-utils';
 import { ALL_GENDERS_ } from '@/types/gender';
 
@@ -47,23 +47,7 @@ const formSchema = z.object({
   department: z.string().min(1),
   gender: z.enum(ALL_GENDERS_),
   active: z.boolean(),
-
-  // All selectable privileges
-  // TODO(marko): get this from `/types/privileges.ts`
-  privilege: z.union([
-    z.tuple([]),
-    z.array(
-      z.enum([
-        'ADMIN',
-        'FILTER',
-        'SEARCH',
-        'TRADE_STOCKS',
-        'VIEW_STOCKS',
-        'CONTRACTS',
-        'NEW_INSURANCES',
-      ])
-    ),
-  ]),
+  privilege: z.union([z.tuple([]), z.array(z.enum(EMPLOYEE_PRIVILEGES_))]),
 });
 
 export type EmployeeFormAction =
