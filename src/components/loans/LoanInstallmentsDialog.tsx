@@ -1,5 +1,6 @@
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -33,7 +34,11 @@ export const LoanInstallmentsDialog = ({
   const { data, isLoading } = useQuery({
     queryKey: ['loanInstallments', loanNumber, page],
     queryFn: async () => {
-      if (loanNumber === null) return { content: [], page: { totalPages: 0 } };
+      if (loanNumber === null)
+        return {
+          content: [],
+          page: { totalPages: 0 },
+        };
       return (await getLoanInstallments(client, loanNumber, page, size)).data;
     },
     enabled: loanNumber !== null && open,
@@ -41,26 +46,28 @@ export const LoanInstallmentsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-4xl h-[70vh]">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Loan Installments</DialogTitle>
+          <DialogTitle className="text-2xl">Loan Installments</DialogTitle>
           <DialogDescription>
             Installments of this loan are shown in the following form.
           </DialogDescription>
         </DialogHeader>
 
-        <DataTable
-          columns={loanInstallmentColumns}
-          data={data?.content ?? []}
-          isLoading={isLoading}
-          pagination={{ page, pageSize: size }}
-          onPaginationChange={(pagination) => setPage(pagination.page)}
-          pageCount={data?.page?.totalPages ?? 0}
-        />
+        <div className="my-6">
+          <DataTable
+            columns={loanInstallmentColumns}
+            data={data?.content ?? []}
+            isLoading={isLoading}
+            pagination={{ page, pageSize: size }}
+            onPaginationChange={(pagination) => setPage(pagination.page)}
+            pageCount={data?.page?.totalPages ?? 0}
+          />
+        </div>
 
-        <Button onClick={() => setOpen(false)} className="mt-4">
-          Close
-        </Button>
+        <DialogClose asChild>
+          <Button variant="secondary">Close</Button>
+        </DialogClose>
       </DialogContent>
     </Dialog>
   );
