@@ -31,7 +31,7 @@ const GuardBlock: React.FC<GuardBlockProps> = ({
   }
 
   // Privileges of current user
-  const userPrivileges = me.me.privileges;
+  const userPrivileges: Privilege[] = me.me.privileges;
 
   // Check if the user has all required privileges.
   const hasPermissions = requiredPrivileges.every((privilege) =>
