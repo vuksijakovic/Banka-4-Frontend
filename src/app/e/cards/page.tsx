@@ -111,7 +111,7 @@ const EmployeeManageCardsPage: React.FC = () => {
     setCurrentCard(card);
     if (card.cardStatus === 'ACTIVATED') {
       setCurrentAction('BLOCK');
-    } else if (card.cardStatus === 'DEACTIVATED') {
+    } else if (card.cardStatus === 'BLOCKED') {
       setCurrentAction('UNBLOCK');
     } else {
       throw Error('invalid state');
