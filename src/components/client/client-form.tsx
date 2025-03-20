@@ -28,7 +28,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SomePartial } from '@/types/utils';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { getDirtyValues } from '@/lib/form-utils';
-import { CLIENT_PRIVILEGES, CLIENT_PRIVILEGES_ } from '@/types/privileges';
+import { CLIENT_PRIVILEGES } from '@/types/privileges';
 import { ALL_GENDERS_ } from '@/types/gender';
 
 const formSchema = z.object({
@@ -43,18 +43,8 @@ const formSchema = z.object({
   gender: z.enum(ALL_GENDERS_, { required_error: 'Gender is required' }),
   privilege: z.union([
     z.tuple([]),
-    z.array(
-      z.enum([
-        'ADMIN',
-        'FILTER',
-        'SEARCH',
-        'TRADE_STOCKS',
-        'VIEW_STOCKS',
-        'CONTRACTS',
-        'NEW_INSURANCES',
-      ])
-    ),
-  ]),
+    z.enum(['']),
+  ]) /* TODO: swap this enum with CLIENT_PRIVILEGES_ */,
 });
 
 export type ClientFormAction =
