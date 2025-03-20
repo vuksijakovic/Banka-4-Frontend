@@ -1,5 +1,5 @@
 import { Gender } from '@/types/gender';
-import { Privilege } from '@/types/privileges';
+import { ClientPrivilege, Privilege } from '@/types/privileges';
 
 export interface ClientResponseDto {
   id: string;
@@ -10,7 +10,7 @@ export interface ClientResponseDto {
   email: string;
   phone: string;
   address: string;
-  privileges: Privilege[];
+  privileges: ClientPrivilege[];
   has2FA: boolean;
 
   // TODO(marko): add accounts field

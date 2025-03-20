@@ -11,7 +11,7 @@ export const EMPLOYEE_PRIVILEGES_ = [
   'NEW_INSURANCES',
 ] as const;
 
-export const CLIENT_PRIVILEGES_ = [] as const;
+export const CLIENT_PRIVILEGES_ = ['DUMMY_PRIVILEGE'] as const;
 
 export const ALL_PRIVILEGES_ = [
   ...EMPLOYEE_PRIVILEGES_,

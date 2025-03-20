@@ -1,4 +1,4 @@
-import { Privilege } from '@/types/privileges';
+import { ClientPrivilege, Privilege } from '@/types/privileges';
 import { Currency } from '@/types/currency';
 import { Gender } from '@/types/gender';
 
@@ -30,7 +30,7 @@ export interface NewClientDto {
   email: string;
   phone: string;
   address: string;
-  privilege: Privilege[];
+  privilege: ClientPrivilege[] | [];
 }
 
 export interface SetAccountLimitsDto {
