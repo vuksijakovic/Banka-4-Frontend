@@ -1,4 +1,4 @@
-import { Privilege } from '@/types/privileges';
+import { EmployeePrivilege } from '@/types/privileges';
 
 export interface NewEmployeeRequest {
   firstName: string;
@@ -9,7 +9,7 @@ export interface NewEmployeeRequest {
   email: string;
   phone: string;
   address: string;
-  privilege: Privilege[];
+  privilege: EmployeePrivilege[];
   position: string;
   department: string;
   active: boolean;
