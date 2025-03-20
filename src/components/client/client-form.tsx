@@ -41,7 +41,20 @@ const formSchema = z.object({
     .regex(/^(\+3816|06)(\d{7,8}|(77|78)\d{5,6})$/, 'Invalid phone number'),
   address: z.string().min(1, 'Address is required'),
   gender: z.enum(ALL_GENDERS_, { required_error: 'Gender is required' }),
-  privilege: z.union([z.tuple([]), z.array(z.enum(CLIENT_PRIVILEGES_))]),
+  privilege: z.union([
+    z.tuple([]),
+    z.array(
+      z.enum([
+        'ADMIN',
+        'FILTER',
+        'SEARCH',
+        'TRADE_STOCKS',
+        'VIEW_STOCKS',
+        'CONTRACTS',
+        'NEW_INSURANCES',
+      ])
+    ),
+  ]),
 });
 
 export type ClientFormAction =
