@@ -30,8 +30,6 @@ const GuardBlock: React.FC<GuardBlockProps> = ({
     redirect('/auth/login');
   }
 
-  if (me.type === 'client') {
-  }
   // Privileges of current user
   const userPrivileges = me.me.privileges;
 
